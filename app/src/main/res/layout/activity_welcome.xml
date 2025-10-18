@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WelcomeActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/welcome_image"
+        android:contentDescription="Background Image" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="180dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TRAVELMATE"
+                android:textColor="@color/explora_orange"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:shadowColor="@color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:text="- IF NOT NOW, WHEN? -"
+                android:textColor="@color/explora_orange"
+                android:textSize="14sp"
+                android:shadowColor="@color/black"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
+
+            <Button
+                android:id="@+id/btnGoToLogin"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/button_rounded_orange"
+                android:text="LOGIN"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnGoToSignUp"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/button_rounded_orange"
+                android:text="SIGN UP"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:gravity="center_vertical">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/white"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OR"
+                    android:textColor="@color/white"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/white"/>
+            </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnGoogleSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/button_rounded_google"
+                android:drawableStart="@drawable/ic_google_logo"
+                android:text="Sign in with Google"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:drawablePadding="16dp"
+                android:textAlignment="center"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnFacebookSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/button_rounded_facebook"
+                android:drawableStart="@drawable/ic_facebook_logo"
+                android:text="Continue with Facebook"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:drawablePadding="16dp"
+                android:textAlignment="center"
+                app:tint="@color/white" /> <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/ic_chevron_up"
+            app:tint="@color/white" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
