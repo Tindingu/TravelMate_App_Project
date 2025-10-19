@@ -1,16 +1,15 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.gms.google-services")
-
+    id("com.google.gms.google-services") // Giữ plugin Firebase ở cuối
 }
 
 android {
-    namespace = "com.example.travelmate_app"
-    compileSdk = 36
+    namespace = "com.example.travelmate_app"  // ✅ sửa lại cho đúng với Firebase
+    compileSdk = 36  // nên để 34, ổn định hơn 36
 
     defaultConfig {
-        applicationId = "com.example.travelmate_app"
+        applicationId = "com.example.travelmate_app" // ✅ trùng với google-services.json
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -28,25 +27,32 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
 }
 
 dependencies {
-
-    implementation("com.google.firebase:firebase-auth:23.1.0")
+    // --- Firebase ---
+    implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.firebase:firebase-database:21.0.0")
+    implementation("com.google.firebase:firebase-firestore:25.0.0")
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
+    // --- AndroidX / UI ---
+    implementation(libs.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
+    implementation(libs.core.ktx)
+
+    // --- Testing ---
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }

@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TravelMate_App"
+rootProject.name = "TestProject1"
 include(":app")
  

@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="orange">#FF9900</color>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#CCCCCC</color>
+    <color name="colorAccent">#F39C12</color>
+
+    <color name="explora_orange">#F39C12</color>
+    <color name="white">#FFFFFF</color>
+    <color name="gray_text">#888888</color>
+    <color name="black">#000000</color>
+
+    <color name="facebook_blue">#1877F2</color>
+    <color name="google_button_stroke">#CCCCCC</color>
+    <color name="orange">#FFA500</color>
 
 </resources>

@@ -8,25 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:55979451270:android:c2d7d1073cbfa5811f0207",
-        "android_client_info": {
-          "package_name": "com.example.demo"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyClXnF2TgTuCJn77S69dzIiSaXgb5Dm9QI"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:55979451270:android:bfb6b2e13c1e795b1f0207",
         "android_client_info": {
           "package_name": "com.example.travelmate_app"

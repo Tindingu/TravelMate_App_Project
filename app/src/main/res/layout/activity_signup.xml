@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".LoginActivity">
+    tools:context=".SignUpActivity">
 
     <ImageView
-        android:id="@+id/ivBackLogin" android:layout_width="wrap_content"
+        android:id="@+id/ivBackSignUp" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -41,9 +41,20 @@
             android:textSize="14sp" />
 
         <EditText
-            android:id="@+id/etLoginEmail"
+            android:id="@+id/etSignUpName"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:background="@drawable/edittext_rounded_border"
+            android:hint="Your Name"
+            android:inputType="textPersonName"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
+
+        <EditText
+            android:id="@+id/etSignUpEmail"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/edittext_rounded_border"
             android:hint="Email ID"
             android:inputType="textEmailAddress"
@@ -51,7 +62,7 @@
             android:paddingEnd="24dp" />
 
         <EditText
-            android:id="@+id/etLoginPassword"
+            android:id="@+id/etSignUpPassword"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="16dp"
@@ -62,22 +73,14 @@
             android:paddingEnd="24dp" />
 
         <Button
-            android:id="@+id/btnLogin"
+            android:id="@+id/btnSignUp"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/button_rounded_orange"
-            android:text="LOG IN"
+            android:text="SIGN UP"
             android:textColor="@color/white"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvForgotPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Forgot your password?"
-            android:textColor="@color/gray_text" />
 
     </LinearLayout>
 
