@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TestProject1</string>
+    <string name="default_web_client_id">55979451270-v7j3d900ate2visipbqc2a450c0r26sh.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">25049264524704261</string>
+    <string name="facebook_client_token">b8712459157185aff60f0a836cd0859d</string>
+
 </resources>

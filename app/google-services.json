@@ -13,7 +13,20 @@
           "package_name": "com.example.travelmate_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "55979451270-v7j3d900ate2visipbqc2a450c0r26sh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.travelmate_app",
+            "certificate_hash": "404548E93DD223DEFC9DBD95E46059BE14DF2430"
+          }
+        },
+        {
+          "client_id": "55979451270-v7j3d900ate2visipbqc2a450c0r26sh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyClXnF2TgTuCJn77S69dzIiSaXgb5Dm9QI"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "55979451270-v7j3d900ate2visipbqc2a450c0r26sh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
