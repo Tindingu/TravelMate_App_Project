@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText etEmail, etPassword;
+    private EditText etEmail, etPassword, etName;
     private Button btnSignUp;
     private ImageView ivBackSignUp;
 
@@ -34,6 +35,7 @@ public class SignUpActivity extends AppCompatActivity {
         // Ánh xạ view
         etEmail = findViewById(R.id.etSignUpEmail);
         etPassword = findViewById(R.id.etSignUpPassword);
+        etName = findViewById(R.id.etSignUpName);
         btnSignUp = findViewById(R.id.btnSignUp);
         ivBackSignUp = findViewById(R.id.ivBackSignUp);
 
@@ -45,10 +47,11 @@ public class SignUpActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
+            String name = etName.getText().toString().trim();
 
             // Kiểm tra dữ liệu
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+                Toast.makeText(this, "Please enter name, email and password", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -59,10 +62,17 @@ public class SignUpActivity extends AppCompatActivity {
                             FirebaseUser user = auth.getCurrentUser();
 
                             if (user != null) {
-                                // Lưu vào Firestore
+                                // ✅ Cập nhật tên hiển thị cho Firebase User
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(name)
+                                        .build();
+                                user.updateProfile(profileUpdates);
+
+                                // ✅ Lưu thông tin vào Firestore
                                 Map<String, Object> userInfo = new HashMap<>();
-                                userInfo.put("email", user.getEmail());
                                 userInfo.put("uid", user.getUid());
+                                userInfo.put("name", name);
+                                userInfo.put("email", email);
                                 userInfo.put("createdAt", System.currentTimeMillis());
 
                                 firestore.collection("users")
@@ -77,8 +87,11 @@ public class SignUpActivity extends AppCompatActivity {
                             }
 
                             Toast.makeText(this, "🎉 Sign up successful!", Toast.LENGTH_SHORT).show();
-                            Intent   intent = new Intent(this, WelcomeActivity.class);
+
+                            // Chuyển sang trang Welcome hoặc Home
+                            Intent intent = new Intent(this, WelcomeActivity.class);
                             startActivity(intent);
+                            finish();
                         } else {
                             Toast.makeText(this, "❌ Sign up failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }

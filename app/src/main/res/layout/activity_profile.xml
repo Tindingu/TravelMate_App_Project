@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <!-- 🔹 Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingVertical="8dp">
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chevron_up"
+                android:rotation="270"
+                android:contentDescription="Back" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/ivSetting"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_menu"
+                android:contentDescription="Settings" />
+
+            <ImageView
+                android:id="@+id/ivNotification"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_ring"
+                android:contentDescription="Notifications" />
+        </LinearLayout>
+
+        <!-- 🔹 Avatar + Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_rounded_border"
+            android:padding="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp">
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:background="@drawable/avatar_circle_bg"
+                android:src="@drawable/avttest"
+                android:scaleType="centerCrop"
+                android:padding="2dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:id="@+id/tvProfileName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="User Name"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000" />
+
+                <TextView
+                    android:id="@+id/tvJoinDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Since January 2021"
+                    android:textSize="13sp"
+                    android:textColor="#777777"
+                    android:layout_marginTop="4dp" />
+
+                <TextView
+                    android:id="@+id/tvMemberType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Member Gold"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/button_rounded_orange"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginTop="6dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 🔹 Wallet / Points / Voucher / PayLater -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="@drawable/edittext_rounded_border"
+            android:gravity="center"
+            android:weightSum="4">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_wallet" />
+
+                <TextView
+                    android:text="Wallet"
+                    android:textSize="13sp"
+                    android:textColor="#000000"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_point" />
+                <TextView
+                    android:text="Points"
+                    android:textSize="13sp"
+                    android:textColor="#000000"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_voucher" />
+                <TextView
+                    android:text="Voucher"
+                    android:textSize="13sp"
+                    android:textColor="#000000"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_card" />
+                <TextView
+                    android:text="PayLater"
+                    android:textSize="13sp"
+                    android:textColor="#000000"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_rounded_border"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+
+
+        </LinearLayout>
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChartProfileStats"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="16dp"
+            android:padding="10dp" />
+
+        <!-- 🔹 Logout -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Logout"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/button_rounded_orange" />
+    </LinearLayout>
+</ScrollView>

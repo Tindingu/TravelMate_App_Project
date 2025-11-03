@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+<!--Ten+ avt-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="16dp"
+        android:paddingTop="36dp"
+
+        android:gravity="center_vertical">
+        <ImageView
+            android:id="@+id/ivSearch1"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="10dp"
+            android:background="@android:color/transparent"
+            android:padding="10dp"
+            android:src="@drawable/ic_menu"
+            />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Hello text -->
+                <TextView
+                    android:id="@+id/tvHello"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hello Aldito"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:layout_marginEnd="8dp" />
+
+        <ImageView
+            android:id="@+id/ivProfile"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/avatar_circle_bg"
+            android:src="@drawable/avttest"
+            android:scaleType="fitCenter"
+            android:padding="2dp"
+            android:contentDescription="Profile Avatar" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp">
+
+        <!-- Ô search -->
+
+        <!-- Icon nằm trong ô -->
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/edittext_rounded_border"
+            android:hint='Try "Hawaii"'
+            android:paddingStart="16dp"
+            android:paddingEnd="48dp"
+            android:textColorHint="#999999"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/ivSearch"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_search"
+            android:contentDescription="Search" />
+    </RelativeLayout>
+
+
+    <!-- 🔸 Spacer (đẩy phần dưới xuống cuối) -->
+
+    <!-- 🔹 BOTTOM NAVIGATION -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@android:color/white"
+        android:elevation="8dp">
+
+        <!-- Home -->
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:layout_marginHorizontal="18dp"
+            android:background="@drawable/nav_item_selected_bg">
+
+            <ImageView
+                android:id="@+id/icHome"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/home" />
+        </LinearLayout>
+
+        <!-- Bookmark -->
+        <LinearLayout
+            android:id="@+id/navBookmark"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/icBookmark"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_bookmark" />
+        </LinearLayout>
+
+        <!-- Calendar -->
+        <LinearLayout
+            android:id="@+id/navCalendar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/icCalendar"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginHorizontal="18dp"
+                android:src="@drawable/ic_calendar" />
+        </LinearLayout>
+
+        <!-- Notifications -->
+        <LinearLayout
+            android:id="@+id/navNotification"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/icNotification"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_ring" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

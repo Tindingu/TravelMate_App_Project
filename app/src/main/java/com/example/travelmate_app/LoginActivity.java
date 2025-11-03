@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(this, "✅ Login successful: " + user.getEmail(), Toast.LENGTH_SHORT).show();
 
                             // Chuyển sang trang Welcome hoặc MainActivity
-                            Intent intent = new Intent(this, MainActivity.class);
+                            Intent intent = new Intent(this, Home.class);
                             startActivity(intent);   // 🟢 mở MainActivity
                             finish();                // 🔵 đóng LoginActivity để không quay lại bằng nút Back
 
