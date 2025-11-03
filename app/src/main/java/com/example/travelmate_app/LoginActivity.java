@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin;
     private ImageView ivBackLogin;
+    private TextView tvForgotPassword;
 
     private FirebaseAuth auth;
 
@@ -31,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etLoginPassword);
         btnLogin = findViewById(R.id.btnLogin);
         ivBackLogin = findViewById(R.id.ivBackLogin);
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
         // Khởi tạo Firebase
         auth = FirebaseAuth.getInstance();
@@ -65,5 +68,11 @@ public class LoginActivity extends AppCompatActivity {
 
         // Nút quay lại
         ivBackLogin.setOnClickListener(v -> finish());
+
+        // Sự kiện khi nhấn "Forgot your password?"
+        tvForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
     }
 }
