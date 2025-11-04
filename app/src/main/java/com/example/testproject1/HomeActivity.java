@@ -1,20 +1,19 @@
-    package com.example.travelmate_app;
+    package com.example.testproject1;
 
     import android.content.Intent;
-    import android.media.Image;
     import android.os.Bundle;
     import android.view.View;
-    import android.widget.Button;
     import android.widget.ImageView;
     import android.widget.LinearLayout;
     import android.widget.TextView;
 
     import androidx.appcompat.app.AppCompatActivity;
 
+    import com.example.testproject1.ProfileActivity;
     import com.google.firebase.auth.FirebaseAuth;
     import com.google.firebase.auth.FirebaseUser;
 
-    public class Home extends AppCompatActivity {
+    public class HomeActivity extends AppCompatActivity {
 
         LinearLayout navHome, navBookmark, navCalendar, navNotification;
         private FirebaseAuth auth;

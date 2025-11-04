@@ -1,42 +1,49 @@
 {
   "project_info": {
-    "project_number": "55979451270",
-    "firebase_url": "https://poised-honor-471206-j7-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "poised-honor-471206-j7",
-    "storage_bucket": "poised-honor-471206-j7.firebasestorage.app"
+    "project_number": "542198941781",
+    "project_id": "travelapp-b67cb",
+    "storage_bucket": "travelapp-b67cb.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:55979451270:android:bfb6b2e13c1e795b1f0207",
+        "mobilesdk_app_id": "1:542198941781:android:cf4dd3e83a11d072676cdc",
         "android_client_info": {
-          "package_name": "com.example.travelmate_app"
+          "package_name": "com.example.testproject1"
         }
       },
       "oauth_client": [
         {
-          "client_id": "55979451270-v7j3d900ate2visipbqc2a450c0r26sh.apps.googleusercontent.com",
+          "client_id": "542198941781-pjkov370c1p2m0bhsd6cjgltbanj9bek.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.travelmate_app",
-            "certificate_hash": "404548E93DD223DEFC9DBD95E46059BE14DF2430"
+            "package_name": "com.example.testproject1",
+            "certificate_hash": "d2418ee0eab3d77cfdfcd70351a247b2e198772b"
           }
         },
         {
-          "client_id": "55979451270-v7j3d900ate2visipbqc2a450c0r26sh.apps.googleusercontent.com",
+          "client_id": "542198941781-ui3n5i28blikj9ml7ont894e5kolph7q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.testproject1",
+            "certificate_hash": "404548e93dd223defc9dbd95e46059be14df2430"
+          }
+        },
+        {
+          "client_id": "542198941781-jrc9jj9qi6oko2uc56b0eacv46d1svnh.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyClXnF2TgTuCJn77S69dzIiSaXgb5Dm9QI"
+          "current_key": "AIzaSyDRTAp7VH5gyNUgbXWVJhVnoKhuq_5UR0A"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "55979451270-v7j3d900ate2visipbqc2a450c0r26sh.apps.googleusercontent.com",
+              "client_id": "542198941781-jrc9jj9qi6oko2uc56b0eacv46d1svnh.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -1,7 +1,8 @@
-package com.example.travelmate_app;
+package com.example.testproject1;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -13,19 +14,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.github.mikephil.charting.model.GradientColor;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-
-import android.graphics.Color;
+import com.example.testproject1.LoginActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.model.GradientColor;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -66,13 +66,13 @@ public class ProfileActivity extends AppCompatActivity {
         android.util.Log.d("DEBUG_PROFILE", "User = " + (user == null ? "null" : user.getEmail()));
 
         if (user == null) {
-            Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+            Intent intent = new Intent(ProfileActivity.this, com.example.testproject1.LoginActivity.class);
             startActivity(intent);
             finish();
             return;
         }
 
-        // 🔹 Lấy dữ liệu người dùng từ Firestore
+        // 🔹 Lấy dữ liệu người dùng từ Firestore hiển thị tên
         db.collection("users").document(user.getUid())
                 .get()
                 .addOnSuccessListener(document -> {
@@ -80,6 +80,35 @@ public class ProfileActivity extends AppCompatActivity {
                         String name = document.getString("name");
                         tvProfileName.setText(name != null ? name : "User");
                     }
+                });
+// 🔹 Lấy dữ liệu người dùng từ Firestore hiển thị ngày tham gia
+        db.collection("users").document(user.getUid())
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        // 🔹 Lấy tên từ Firestore
+                        String name = document.getString("name");
+                        tvProfileName.setText(name != null ? name : "User");
+
+                        // 🔹 Lấy thời gian tạo tài khoản từ Firebase Authentication (Auth metadata)
+                        if (user.getMetadata() != null) {
+                            long creationTime = user.getMetadata().getCreationTimestamp();
+                            java.util.Date date = new java.util.Date(creationTime);
+                            java.text.SimpleDateFormat sdf =
+                                    new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault());
+                            String formattedDate = sdf.format(date);
+                            tvJoinDate.setText("Tham gia ngày " + formattedDate);
+                        } else {
+                            tvJoinDate.setText("Tham gia gần đây");
+                        }
+
+                        // 🔹 Giữ phần hiển thị member type (nếu muốn có thể bỏ)
+                        tvMemberType.setText("Member Gold");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("PROFILE_FIRESTORE", "Lỗi đọc dữ liệu Firestore", e);
+                    tvJoinDate.setText("Không thể tải thời gian tham gia");
                 });
 
         // 🔹 Nút Back

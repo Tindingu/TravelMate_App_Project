@@ -1,4 +1,4 @@
-package com.example.travelmate_app;
+package com.example.testproject1;
 
 import android.os.Bundle;
 
@@ -8,7 +8,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.travelmate_app.R;
+import com.example.testproject1.R;
 
 public class MainActivity extends AppCompatActivity {
 

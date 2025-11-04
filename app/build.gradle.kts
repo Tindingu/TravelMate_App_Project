@@ -1,15 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    id("com.google.gms.google-services") // Giữ plugin Firebase ở cuối
+    id ("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.travelmate_app"  // ✅ sửa lại cho đúng với Firebase
-    compileSdk = 36  // nên để 34, ổn định hơn 36
+    namespace = "com.example.testproject1"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.travelmate_app" // ✅ trùng với google-services.json
+        applicationId = "com.example.testproject1"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -27,36 +26,26 @@ android {
             )
         }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 dependencies {
-    // --- Firebase ---
-    implementation("com.google.firebase:firebase-auth:23.0.0")
-    implementation("com.google.firebase:firebase-database:21.0.0")
-    implementation("com.google.firebase:firebase-firestore:25.0.0")
-    implementation("com.facebook.android:facebook-android-sdk:[16,17)")
-    implementation("com.google.android.gms:play-services-auth:21.1.0")
-    // Bieu do barchart
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
-    // --- AndroidX / UI ---
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.core.ktx)
-
-    // --- Testing ---
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-firestore:24.11.1")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.facebook.android:facebook-login:17.0.0")
 }
