@@ -12,5 +12,6 @@
     <color name="facebook_blue">#1877F2</color>
     <color name="google_button_stroke">#CCCCCC</color>
     <color name="orange">#FFA500</color>
+    <color name="purple_500">#6200EE</color>
 
 </resources>
