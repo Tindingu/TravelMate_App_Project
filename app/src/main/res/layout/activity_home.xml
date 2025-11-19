@@ -89,10 +89,13 @@
     <!-- 🔸 Spacer (đẩy phần dưới xuống cuối) -->
 
     <!-- 🔹 BOTTOM NAVIGATION -->
-    <View
+    <fragment
+        android:id="@+id/homeMap"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"/>
+
 
     <LinearLayout
         android:id="@+id/bottomNav"
