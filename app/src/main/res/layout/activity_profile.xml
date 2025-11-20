@@ -72,14 +72,36 @@
                 android:orientation="vertical"
                 android:layout_marginStart="12dp">
 
-                <TextView
-                    android:id="@+id/tvProfileName"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="User Name"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#000000" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvProfileName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="User Name"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:id="@+id/layoutProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hồ sơ"
+                        android:textSize="14sp"
+                        android:textColor="@color/purple_500"
+                        android:textStyle="bold"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="8dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/tvJoinDate"
@@ -102,6 +124,15 @@
                     android:paddingVertical="4dp"
                     android:layout_marginTop="6dp" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivEditProfile"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/profile_setting"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:contentDescription="Edit Profile" />
         </LinearLayout>
 
         <!-- 🔹 Wallet / Points / Voucher / PayLater -->
@@ -193,17 +224,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/edittext_rounded_border"
-            android:orientation="vertical"
-            android:padding="12dp">
-
-
-
-        </LinearLayout>
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/barChartProfileStats"
             android:layout_width="match_parent"
