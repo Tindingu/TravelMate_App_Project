@@ -21,6 +21,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private ImageView ivBack;
     private FirebaseAuth auth;
     private LoadingDialog loadingDialog;
+    private boolean isFromChangePassword = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +30,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         loadingDialog = new LoadingDialog(this);
+
+        // Kiểm tra xem có được gọi từ ChangePasswordActivity không
+        Intent intent = getIntent();
+        isFromChangePassword = intent.getBooleanExtra("fromChangePassword", false);
 
         initViews();
         setupListeners();
@@ -86,15 +91,25 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     // ============================================================
     private void showSuccessDialog(String email) {
-        new AlertDialog.Builder(this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle("📩 Email Đã Gửi Thành Công")
                 .setMessage("Liên kết đặt lại mật khẩu đã được gửi tới:\n\n" + email +
-                        "\n\nHãy kiểm tra hộp thư và làm theo hướng dẫn để đặt lại mật khẩu." +
+                        "\n\nHãy kiểm tra hộp thư và click vào link để đặt lại mật khẩu." +
                         "\n\n💡 Nếu không thấy, hãy kiểm tra mục Spam/Thư rác.")
-                .setPositiveButton("OK", (dialog, which) -> navigateToLogin())
                 .setNegativeButton("Gửi lại", (dialog, which) -> sendPasswordResetEmail(email))
-                .setCancelable(false)
-                .show();
+                .setCancelable(false);
+
+        // Chuyển sang EmailVerifyActivity để chờ xác thực
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            Intent intent = new Intent(ForgotPasswordActivity.this, EmailVerifyActivity.class);
+            intent.putExtra("email", email);
+            intent.putExtra("isPasswordReset", true);
+            intent.putExtra("fromChangePassword", isFromChangePassword);
+            startActivity(intent);
+            finish();
+        });
+
+        builder.show();
     }
 
     private void sendPasswordResetEmail(String email) {

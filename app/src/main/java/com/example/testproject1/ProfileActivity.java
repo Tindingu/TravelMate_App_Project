@@ -33,7 +33,7 @@ import java.util.Locale;
 public class ProfileActivity extends AppCompatActivity {
 
     // 🔹 View
-    private TextView tvProfileName, tvJoinDate, tvMemberType;
+    private TextView tvProfileName, tvJoinDate, tvMemberType, layoutProfile;
     private ImageView ivAvatar, ivBack;
     private Button btnLogout;
     private BarChart barChart;
@@ -56,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
         loadUserData();
         setupLogoutButton();
         setupBackButton();
+        setupProfileButton();
         setupUserChart();
     }
 
@@ -83,6 +84,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvProfileName = findViewById(R.id.tvProfileName);
         tvJoinDate = findViewById(R.id.tvJoinDate);
         tvMemberType = findViewById(R.id.tvMemberType);
+        layoutProfile = findViewById(R.id.layoutProfile);
         ivAvatar = findViewById(R.id.ivAvatar);
         ivBack = findViewById(R.id.ivBack);
         btnLogout = findViewById(R.id.btnLogout);
@@ -156,7 +158,16 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     // ============================================================
-    // 🔹 8. Biểu đồ thống kê người dùng
+    // 🔹 8. Nút Hồ sơ - chuyển sang ProfileUpdate
+    private void setupProfileButton() {
+        layoutProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, ProfileUpdateActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    // ============================================================
+    // 🔹 9. Biểu đồ thống kê người dùng
     private void setupUserChart() {
         ArrayList<BarEntry> entries = new ArrayList<>();
         entries.add(new BarEntry(0, 120)); // Likes

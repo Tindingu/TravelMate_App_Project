@@ -117,7 +117,7 @@
                     android:id="@+id/btnChangeAvatar"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="@string/change_avatar"
+                    android:text="@string/edit"
                     android:textAllCaps="false"
                     android:textSize="14sp"
                     android:textColor="@color/white"
@@ -164,101 +164,7 @@
                     android:id="@+id/btnChangeUsername"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="@string/change_username"
-                    android:textAllCaps="false"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:background="@drawable/button_white_border_purple"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp" />
-
-            </LinearLayout>
-
-            <!-- Email Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/email"
-                        android:textSize="16sp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sample_email_value"
-                        android:textSize="14sp"
-                        android:textColor="@color/gray_text" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btnChangeEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="@string/change_email"
-                    android:textAllCaps="false"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:background="@drawable/button_white_border_purple"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp" />
-
-            </LinearLayout>
-
-            <!-- Phone Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/phone_number"
-                        android:textSize="16sp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/tvPhone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sample_phone_value"
-                        android:textSize="14sp"
-                        android:textColor="@color/gray_text" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btnChangePhone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="@string/change_phone"
+                    android:text="@string/edit"
                     android:textAllCaps="false"
                     android:textSize="14sp"
                     android:textColor="@color/white"
@@ -305,7 +211,7 @@
                     android:id="@+id/btnChangePassword"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="@string/change_password"
+                    android:text="@string/edit"
                     android:textAllCaps="false"
                     android:textSize="14sp"
                     android:textColor="@color/white"
@@ -315,18 +221,6 @@
 
             </LinearLayout>
 
-            <!-- Main Update button with purple background -->
-            <Button
-                android:id="@+id/btnUpdate"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="@string/update"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:background="@drawable/button_rounded_purple"
-                android:layout_marginBottom="20dp" />
 
         </LinearLayout>
 

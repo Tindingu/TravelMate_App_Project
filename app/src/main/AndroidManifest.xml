@@ -22,7 +22,12 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".ProfileUpdateActivity" />
+        <activity android:name=".ChangeUsernameActivity" />
+        <activity android:name=".ChangePasswordActivity" />
         <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".EmailVerifyActivity" />
+        <activity android:name=".NewPasswordActivity" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
