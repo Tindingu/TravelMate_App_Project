@@ -140,15 +140,48 @@ public class HomeActivity extends AppCompatActivity {
                             } else {
                                 name.setText("Hello User!");
                             }
+
+                            // 🔹 Lấy avatar từ Firestore và hiển thị
+                            String photoUrl = document.getString("photoUrl");
+                            if (photoUrl != null && !photoUrl.isEmpty()) {
+                                // Load avatar từ URL bằng Glide với hình tròn
+                                com.bumptech.glide.Glide.with(this)
+                                        .load(photoUrl)
+                                        .circleCrop()
+                                        .placeholder(R.drawable.sample_avatar)
+                                        .error(R.drawable.sample_avatar)
+                                        .into(btnavt);
+                            } else {
+                                // Hiển thị avatar mặc định
+                                com.bumptech.glide.Glide.with(this)
+                                        .load(R.drawable.sample_avatar)
+                                        .circleCrop()
+                                        .into(btnavt);
+                            }
                         } else {
                             name.setText("Hello User!");
+                            // Load avatar mặc định khi không có document
+                            com.bumptech.glide.Glide.with(this)
+                                    .load(R.drawable.sample_avatar)
+                                    .circleCrop()
+                                    .into(btnavt);
                         }
                     })
                     .addOnFailureListener(e -> {
                         name.setText("Hello User!");
+                        // Load avatar mặc định khi có lỗi
+                        com.bumptech.glide.Glide.with(this)
+                                .load(R.drawable.sample_avatar)
+                                .circleCrop()
+                                .into(btnavt);
                     });
         } else {
             name.setText("Hello Guest!");
+            // Load avatar mặc định cho guest
+            com.bumptech.glide.Glide.with(this)
+                    .load(R.drawable.sample_avatar)
+                    .circleCrop()
+                    .into(btnavt);
         }
 
         // 🔹 Khi nhấn avatar → mở ProfileActivity
@@ -172,5 +205,30 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setActive(LinearLayout selected) {
         selected.setBackgroundResource(R.drawable.nav_item_selected_bg);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // 🔹 Tự động cập nhật avatar khi quay lại từ màn hình khác
+        if (user != null) {
+            db.collection("users").document(user.getUid())
+                    .get()
+                    .addOnSuccessListener(document -> {
+                        if (document.exists()) {
+                            String photoUrl = document.getString("photoUrl");
+                            if (photoUrl != null && !photoUrl.isEmpty()) {
+                                // Cập nhật avatar mới
+                                com.bumptech.glide.Glide.with(this)
+                                        .load(photoUrl)
+                                        .circleCrop()
+                                        .placeholder(R.drawable.sample_avatar)
+                                        .error(R.drawable.sample_avatar)
+                                        .into(btnavt);
+                            }
+                        }
+                    });
+        }
     }
 }

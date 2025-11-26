@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -43,6 +45,9 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseUser user;
 
+    // Activity Result Launcher for ProfileUpdateActivity
+    private ActivityResultLauncher<Intent> profileUpdateActivityLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
         initFirebase();
         initViews();
         checkLoginStatus();
+        initProfileUpdateActivityLauncher();
         loadUserData();
         setupLogoutButton();
         setupBackButton();
@@ -102,6 +108,21 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     // ============================================================
+    // 🔹 4. Khởi tạo Activity Result Launcher cho ProfileUpdate
+    private void initProfileUpdateActivityLauncher() {
+        profileUpdateActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                // Khi quay lại từ ProfileUpdateActivity, load lại user data và avatar
+                // để cập nhật những thay đổi có thể có (bao gồm avatar mới)
+                loadUserData();
+                // Set result OK để HomeActivity cũng cập nhật
+                setResult(RESULT_OK);
+            }
+        );
+    }
+
+    // ============================================================
     // 🔹 5. Lấy dữ liệu người dùng từ Firestore
     private void loadUserData() {
         if (user == null) return;
@@ -113,6 +134,23 @@ public class ProfileActivity extends AppCompatActivity {
                         // 🔸 Hiển thị tên
                         String name = document.getString("name");
                         tvProfileName.setText(name != null ? name : "User");
+
+                        // 🔸 Load avatar từ photoUrl
+                        String photoUrl = document.getString("photoUrl");
+                        if (photoUrl != null && !photoUrl.isEmpty()) {
+                            com.bumptech.glide.Glide.with(this)
+                                    .load(photoUrl)
+                                    .circleCrop()
+                                    .placeholder(R.drawable.sample_avatar)
+                                    .error(R.drawable.sample_avatar)
+                                    .into(ivAvatar);
+                        } else {
+                            // Load default avatar
+                            com.bumptech.glide.Glide.with(this)
+                                    .load(R.drawable.sample_avatar)
+                                    .circleCrop()
+                                    .into(ivAvatar);
+                        }
 
                         // 🔸 Hiển thị ngày tham gia
                         if (user.getMetadata() != null) {
@@ -162,7 +200,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupProfileButton() {
         layoutProfile.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, ProfileUpdateActivity.class);
-            startActivity(intent);
+            profileUpdateActivityLauncher.launch(intent);
         });
     }
 
@@ -215,5 +253,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         barChart.animateY(1200, com.github.mikephil.charting.animation.Easing.EaseInOutQuad);
         barChart.invalidate();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload user data when activity resumes (in case user came back from ProfileUpdateActivity with avatar changes)
+        loadUserData();
     }
 }

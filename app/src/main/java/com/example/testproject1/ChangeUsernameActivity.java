@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -25,6 +26,7 @@ public class ChangeUsernameActivity extends AppCompatActivity {
     // 🔹 Views
     private EditText etUsername;
     private Button btnCancel, btnDone;
+    private Toolbar toolbar; // added
 
     // 🔹 Firebase
     private FirebaseAuth auth;
@@ -43,6 +45,7 @@ public class ChangeUsernameActivity extends AppCompatActivity {
         setupWindowInsets();
         initFirebase();
         initViews();
+        setupToolbar(); // added
         checkLoginStatus();
         loadCurrentUsername();
         setupClickListeners();
@@ -72,6 +75,25 @@ public class ChangeUsernameActivity extends AppCompatActivity {
         etUsername = findViewById(R.id.etUsername);
         btnCancel = findViewById(R.id.btnCancel);
         btnDone = findViewById(R.id.btnDone);
+        toolbar = findViewById(R.id.toolbar); // added
+    }
+
+    // ============================================================
+    // 🔹 3.1 Thiết lập toolbar
+    private void setupToolbar() {
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                // keep the toolbar title from XML visible (do not disable show title)
+            }
+
+            // Handle navigation click
+            toolbar.setNavigationOnClickListener(v -> {
+                setResult(RESULT_CANCELED);
+                finish();
+            });
+        }
     }
 
     // ============================================================
@@ -234,4 +256,3 @@ public class ChangeUsernameActivity extends AppCompatActivity {
         btnDone.setText("Done");
     }
 }
-

@@ -1,6 +1,7 @@
 package com.example.testproject1;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,7 +26,7 @@ public class ProfileUpdateActivity extends AppCompatActivity {
     // 🔹 Views
     private TextView tvDisplayName, tvUsernameDisplay, tvUsername, tvPasswordMask;
     private Button btnChangeAvatar, btnChangeUsername, btnChangePassword;
-    private ImageView ivBack, ivMenu;
+    private ImageView ivBack, ivMenu, ivProfileAvatar;
 
     // 🔹 Firebase
     private FirebaseAuth auth;
@@ -34,6 +36,7 @@ public class ProfileUpdateActivity extends AppCompatActivity {
     // 🔹 Activity Result Launchers
     private ActivityResultLauncher<Intent> changeUsernameResultLauncher;
     private ActivityResultLauncher<Intent> changePasswordResultLauncher;
+    private ActivityResultLauncher<Intent> changeAvatarResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +48,9 @@ public class ProfileUpdateActivity extends AppCompatActivity {
         initFirebase();
         initViews();
         checkLoginStatus();
+        initActivityResultLaunchers();
         loadUserData();
         setupClickListeners();
-        initActivityResultLaunchers();
     }
 
     // ============================================================
@@ -82,6 +85,7 @@ public class ProfileUpdateActivity extends AppCompatActivity {
 
         ivBack = findViewById(R.id.ivBack);
         ivMenu = findViewById(R.id.ivMenu);
+        ivProfileAvatar = findViewById(R.id.ivProfileAvatar);
     }
 
     // ============================================================
@@ -97,6 +101,30 @@ public class ProfileUpdateActivity extends AppCompatActivity {
     // ============================================================
     // 🔹 5. Khởi tạo Activity Result Launchers
     private void initActivityResultLaunchers() {
+        // Launcher cho change avatar
+        changeAvatarResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        String avatarUri = result.getData().getStringExtra("avatar_uri");
+                        String photoUrl = result.getData().getStringExtra("photo_url");
+
+                        if (avatarUri != null) {
+                            // Update the UI avatar ImageView with returned uri
+                            try {
+                                Glide.with(this)
+                                        .load(Uri.parse(avatarUri))
+                                        .circleCrop()
+                                        .into(ivProfileAvatar);
+                            } catch (Exception e) {
+                                android.util.Log.e("PROFILE_UPDATE", "Failed to set avatar image", e);
+                            }
+                            Toast.makeText(this, "Avatar đã được cập nhật", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+
         // Launcher cho change username
         changeUsernameResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -146,6 +174,23 @@ public class ProfileUpdateActivity extends AppCompatActivity {
 
                         // Hiển thị password mask
                         tvPasswordMask.setText("••••••••");
+
+                        // Load avatar từ photoUrl
+                        String photoUrl = document.getString("photoUrl");
+                        if (photoUrl != null && !photoUrl.isEmpty()) {
+                            Glide.with(this)
+                                    .load(photoUrl)
+                                    .circleCrop()
+                                    .placeholder(R.drawable.sample_avatar)
+                                    .error(R.drawable.sample_avatar)
+                                    .into(ivProfileAvatar);
+                        } else {
+                            // Load default avatar
+                            Glide.with(this)
+                                    .load(R.drawable.sample_avatar)
+                                    .circleCrop()
+                                    .into(ivProfileAvatar);
+                        }
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -160,13 +205,18 @@ public class ProfileUpdateActivity extends AppCompatActivity {
         ivBack.setOnClickListener(v -> finish());
 
         // Menu button (tạm thời không có logic)
-        ivMenu.setOnClickListener(v -> {
-            Toast.makeText(this, "Menu clicked", Toast.LENGTH_SHORT).show();
+        ivMenu.setOnClickListener(v -> Toast.makeText(this, "Menu clicked", Toast.LENGTH_SHORT).show());
+
+        // Also allow tapping the avatar image itself to edit
+        ivProfileAvatar.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileUpdateActivity.this, ChangeAvatar.class);
+            changeAvatarResultLauncher.launch(intent);
         });
 
         // Change Avatar button
         btnChangeAvatar.setOnClickListener(v -> {
-            Toast.makeText(this, "Chức năng đổi avatar đang phát triển", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ProfileUpdateActivity.this, ChangeAvatar.class);
+            changeAvatarResultLauncher.launch(intent);
         });
 
         // Change Username button

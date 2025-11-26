@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.testproject1"> <uses-permission android:name="android.permission.INTERNET"/>
+    package="com.example.testproject1">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,11 +27,25 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".ProfileUpdateActivity" />
+        <activity android:name=".ChangeAvatar" />
         <activity android:name=".ChangeUsernameActivity" />
         <activity android:name=".ChangePasswordActivity" />
         <activity android:name=".ForgotPasswordActivity" />
-        <activity android:name=".EmailVerifyActivity" />
-        <activity android:name=".NewPasswordActivity" />
+
+        <!-- uCrop activity for image cropping -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>

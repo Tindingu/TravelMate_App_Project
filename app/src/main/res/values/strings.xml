@@ -18,6 +18,9 @@
     <string name="change_phone">Update phone</string>
     <string name="change_password">Update password</string>
     <string name="edit">Edit</string>
+    <string name="edit_avatar">Edit avatar</string>
+    <string name="edit_username">Edit username</string>
+    <string name="edit_password">Edit password</string>
     <string name="update">Save Changes</string>
 
     <!-- Sample/display values (move to dynamic in code later) -->

@@ -78,6 +78,7 @@
                     android:gravity="center_vertical">
 
                     <ImageView
+                        android:id="@+id/ivProfileAvatar"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         android:background="@drawable/avatar_circle_bg"
@@ -117,7 +118,7 @@
                     android:id="@+id/btnChangeAvatar"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="@string/edit"
+                    android:text="@string/edit_avatar"
                     android:textAllCaps="false"
                     android:textSize="14sp"
                     android:textColor="@color/white"
@@ -164,7 +165,7 @@
                     android:id="@+id/btnChangeUsername"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="@string/edit"
+                    android:text="@string/edit_username"
                     android:textAllCaps="false"
                     android:textSize="14sp"
                     android:textColor="@color/white"
@@ -211,7 +212,7 @@
                     android:id="@+id/btnChangePassword"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
-                    android:text="@string/edit"
+                    android:text="@string/edit_password"
                     android:textAllCaps="false"
                     android:textSize="14sp"
                     android:textColor="@color/white"
