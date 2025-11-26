@@ -23,6 +23,7 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".WishlistActivity" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
