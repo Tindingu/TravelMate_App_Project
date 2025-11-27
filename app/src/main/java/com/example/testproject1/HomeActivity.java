@@ -69,7 +69,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     GeminiService gpt;
 
     // API Key (Lưu ý: Nên bảo mật key này trong thực tế)
-    private static final String API_KEY_GEMINI = "AIzaSyABEd262yhDChfltrj4ANpeaf1ol7oswrw";
+    private static final String API_KEY_GEMINI = "AIzaSyAhU4QxT4xDZPcz7bTH-PKRjTMnbZnRmgU";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,16 +160,27 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         rvPlaces.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         placeAdapter = new PlaceAdapter(placeList, place -> {
-            // Sự kiện khi Click vào 1 item trong list
+
+            // 🗺️ 1. Zoom tới vị trí (giữ nguyên)
             if (mMap != null) {
                 LatLng loc = new LatLng(place.getLat(), place.getLon());
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 17f));
 
-                // Thêm marker và hiện info
                 Marker marker = mMap.addMarker(new MarkerOptions().position(loc).title(place.getName()));
                 if (marker != null) marker.showInfoWindow();
             }
+
+            // 📌 2. MỞ TRANG CHI TIẾT QUÁN
+            Intent intent = new Intent(HomeActivity.this, PlaceDetailActivity.class);
+            intent.putExtra("id", place.getId());
+            intent.putExtra("name", place.getName());
+            intent.putExtra("address", place.getAddress());
+            intent.putExtra("rating", place.getRating());
+            intent.putExtra("lat", place.getLat());
+            intent.putExtra("lon", place.getLon());
+            startActivity(intent);
         });
+
 
         rvPlaces.setAdapter(placeAdapter);
     }
@@ -362,4 +373,5 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setActive(LinearLayout layout) {
         layout.setBackgroundResource(R.drawable.nav_item_selected_bg);
     }
+
 }

@@ -57,4 +57,7 @@ dependencies {
     implementation("org.json:json:20231013")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("com.amazonaws:aws-android-sdk-s3:2.73.0")
+    implementation("com.amazonaws:aws-android-sdk-core:2.73.0")
 }
