@@ -69,7 +69,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     GeminiService gpt;
 
     // API Key (Lưu ý: Nên bảo mật key này trong thực tế)
-    private static final String API_KEY_GEMINI = "AIzaSyAhU4QxT4xDZPcz7bTH-PKRjTMnbZnRmgU";
+    private static final String API_KEY_GEMINI = "AIzaSyAnO3FmEU7NIO9VqpJEimnKO6rZKq6hQRM";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
