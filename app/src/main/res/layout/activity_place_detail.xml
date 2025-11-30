@@ -1,124 +1,145 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- 🔹 HEADER NẰM TRÊN CÙNG - CLICK ĐƯỢC -->
+
+
+    <!-- 🔹 NỘI DUNG SCROLL -->
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:id="@+id/headerBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="93dp"
+        android:background="#FFFFFF"
+        android:elevation="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp">
 
-        <!-- ẢNH QUÁN -->
         <ImageView
-            android:id="@+id/ivPlaceImage"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/sample_place" />
+            android:id="@+id/ivBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Back"
+            android:padding="6dp"
+            android:rotation="270"
+            android:src="@drawable/ic_chevron_up" />
 
-        <!-- TÊN QUÁN -->
-        <TextView
-            android:id="@+id/tvPlaceName"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:paddingTop="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
 
-        <!-- ĐỊA CHỈ -->
-        <TextView
-            android:id="@+id/tvPlaceAddress"
-            android:textSize="15sp"
-            android:textColor="#444"
-            android:layout_marginTop="2dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/ivSetting"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_menu" />
 
-        <!-- RATING QUÁN -->
-        <TextView
-            android:id="@+id/tvPlaceRating"
-            android:text="⭐ 4.5"
-            android:textSize="16sp"
-            android:layout_marginTop="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/ivNotification"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_ring" />
+    </LinearLayout>
 
-        <!-- RATING NGƯỜI DÙNG -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="56dp"
+        android:fillViewport="true">
+
         <LinearLayout
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- ẢNH QUÁN -->
+            <ImageView
+                android:id="@+id/ivPlaceImage"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/sample_place" />
+
+            <!-- TÊN QUÁN -->
             <TextView
-                android:text="Đánh giá của bạn:"
-                android:textSize="15sp"
+                android:id="@+id/tvPlaceName"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:paddingTop="12dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <RatingBar
-                android:id="@+id/ratingUser"
+            <!-- ĐỊA CHỈ -->
+            <TextView
+                android:id="@+id/tvPlaceAddress"
+                android:textSize="15sp"
+                android:textColor="#444"
+                android:layout_marginTop="2dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5"
-                android:stepSize="1" />
-        </LinearLayout>
+                android:layout_height="wrap_content" />
 
-        <!-- DANH SÁCH COMMENT -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvComments"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="16dp" />
+            <!-- RATING -->
+            <TextView
+                android:id="@+id/tvPlaceRating"
+                android:textSize="16sp"
+                android:layout_marginTop="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <!-- KHUNG COMMENT -->
-        <LinearLayout
-            android:id="@+id/commentInputBox"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- ⭐ RECYCLERVIEW PREVIEW NHIỀU ẢNH -->
+            <!-- COMMENTS LIST -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvPreviewImages"
+                android:id="@+id/rvComments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:visibility="gone" />
+                android:paddingBottom="16dp" />
 
-            <!-- HÀNG NHẬP -->
+            <!-- KHUNG COMMENT -->
             <LinearLayout
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/etComment"
-                    android:hint="Viết bình luận..."
-                    android:layout_width="0dp"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPreviewImages"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="12dp" />
+                    android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/btnAddImage"
-                    android:src="@drawable/icon_add_image"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="6dp" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/btnSendComment"
-                    android:src="@drawable/icon_send"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:padding="6dp" />
+                    <EditText
+                        android:id="@+id/etComment"
+                        android:hint="Viết bình luận..."
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="12dp" />
+
+                    <ImageView
+                        android:id="@+id/btnAddImage"
+                        android:src="@drawable/icon_add_image"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="6dp" />
+
+                    <ImageView
+                        android:id="@+id/btnSendComment"
+                        android:src="@drawable/icon_send"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="6dp" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
-</ScrollView>
+</FrameLayout>

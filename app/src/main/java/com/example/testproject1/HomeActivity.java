@@ -73,7 +73,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 //    private static final String API_KEY_GEMINI = "AIzaSyDMXgF8hZRMrW18nfh03MBlYegJmpaZXng";
     // API Key (Lưu ý: Nên bảo mật key này trong thực tế)
-    private static final String API_KEY_GEMINI = "AIzaSyCJz54p0R1YCSPM-qn2Jtz98WJUP3FEy4A";
+    private static final String API_KEY_GEMINI = "AIzaSyBFtJOAvsHcTcXeezIm1lXQM_fGl4roz5M";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

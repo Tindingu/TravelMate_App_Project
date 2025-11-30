@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -50,7 +51,7 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
     String placeId, name, address;
     double rating, lat, lon;
-
+    ImageView btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +66,9 @@ public class PlaceDetailActivity extends AppCompatActivity {
         initViews();
         setupPreviewImageList();
         loadComments();
-
         btnAddImage.setOnClickListener(v -> openGallery());
         btnSendComment.setOnClickListener(v -> sendComment());
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void initViews() {
@@ -91,6 +92,10 @@ public class PlaceDetailActivity extends AppCompatActivity {
         adapter = new CommentAdapter(comments);
         rvComments.setLayoutManager(new LinearLayoutManager(this));
         rvComments.setAdapter(adapter);
+
+         btnBack = findViewById(R.id.ivBack);
+        Log.d("BACK_DEBUG", "btnBack = " + btnBack);
+
     }
 
 
