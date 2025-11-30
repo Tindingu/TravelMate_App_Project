@@ -4,9 +4,11 @@ public class PlaceModel {
     private String id;
     private String name;
     private String address;
-    private double rating; // Giả lập
+    private double rating;
     private double lat;
     private double lon;
+
+    private boolean isFavorite = false;
 
     // ⚠️ Firestore cần constructor rỗng
     public PlaceModel() {
@@ -61,4 +63,10 @@ public class PlaceModel {
     }
 
     public void setLon(double lon) { this.lon = lon; }
+    // Getter & Setter cũ
+
+
+    // ⭐ GETTER & SETTER CHO FAVORITE (HomeActivity đang gọi hàm này)
+    public boolean isFavorite() { return isFavorite; }
+    public void setFavorite(boolean favorite) { isFavorite = favorite; }
 }

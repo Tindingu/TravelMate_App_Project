@@ -33,6 +33,7 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".ForgotPasswordActivity" />
+        <activity android:name=".WishlistActivity" />
         <activity android:name=".PlaceDetailActivity" />
 
         <meta-data
