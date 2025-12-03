@@ -34,7 +34,7 @@ public class ChangeUsernameActivity extends AppCompatActivity {
     private FirebaseUser user;
 
     // 🔹 Data
-    private String currentUsername;
+    private String currentDisplayName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class ChangeUsernameActivity extends AppCompatActivity {
         initViews();
         setupToolbar(); // added
         checkLoginStatus();
-        loadCurrentUsername();
+        loadCurrentDisplayName();
         setupClickListeners();
     }
 
@@ -107,14 +107,14 @@ public class ChangeUsernameActivity extends AppCompatActivity {
     }
 
     // ============================================================
-    // 🔹 5. Load username hiện tại từ intent
-    private void loadCurrentUsername() {
+    // 🔹 5. Load display name hiện tại từ intent
+    private void loadCurrentDisplayName() {
         Intent intent = getIntent();
-        currentUsername = intent.getStringExtra("current_username");
+        currentDisplayName = intent.getStringExtra("current_username");
 
-        if (currentUsername != null) {
-            etUsername.setText(currentUsername);
-            etUsername.setSelection(currentUsername.length()); // Đặt con trỏ ở cuối
+        if (currentDisplayName != null) {
+            etUsername.setText(currentDisplayName);
+            etUsername.setSelection(currentDisplayName.length()); // Đặt con trỏ ở cuối
         }
     }
 
@@ -129,7 +129,7 @@ public class ChangeUsernameActivity extends AppCompatActivity {
 
         // Done button
         btnDone.setOnClickListener(v -> {
-            updateUsername();
+            updateDisplayName();
         });
 
         // Handle back gesture
@@ -143,35 +143,29 @@ public class ChangeUsernameActivity extends AppCompatActivity {
     }
 
     // ============================================================
-    // 🔹 7. Cập nhật username
-    private void updateUsername() {
-        String newUsername = etUsername.getText().toString().trim();
+    // 🔹 7. Cập nhật display name
+    private void updateDisplayName() {
+        String newDisplayName = etUsername.getText().toString().trim();
 
         // Validate input
-        if (TextUtils.isEmpty(newUsername)) {
-            Toast.makeText(this, "Username không được để trống", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(newDisplayName)) {
+            Toast.makeText(this, "Tên hiển thị không được để trống", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (newUsername.length() < 3) {
-            Toast.makeText(this, "Username phải có ít nhất 3 ký tự", Toast.LENGTH_SHORT).show();
+        if (newDisplayName.length() < 3) {
+            Toast.makeText(this, "Tên hiển thị phải có ít nhất 3 ký tự", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (newUsername.length() > 30) {
-            Toast.makeText(this, "Username không được quá 30 ký tự", Toast.LENGTH_SHORT).show();
+        if (newDisplayName.length() > 50) {
+            Toast.makeText(this, "Tên hiển thị không được quá 50 ký tự", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Kiểm tra ký tự hợp lệ (chỉ cho phép chữ cái, số, dấu gạch dưới và dấu chấm)
-        if (!newUsername.matches("^[a-zA-Z0-9._]+$")) {
-            Toast.makeText(this, "Username chỉ được chứa chữ cái, số, dấu gạch dưới và dấu chấm", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        // Nếu username không thay đổi
-        if (newUsername.equals(currentUsername)) {
-            Toast.makeText(this, "Username không thay đổi", Toast.LENGTH_SHORT).show();
+        // Nếu display name không thay đổi
+        if (newDisplayName.equals(currentDisplayName)) {
+            Toast.makeText(this, "Tên hiển thị không thay đổi", Toast.LENGTH_SHORT).show();
             setResult(RESULT_CANCELED);
             finish();
             return;
@@ -182,12 +176,12 @@ public class ChangeUsernameActivity extends AppCompatActivity {
         btnDone.setText("Đang cập nhật...");
 
         // Cập nhật lên Firestore
-        updateUsernameInFirestore(newUsername);
+        updateDisplayNameInFirestore(newDisplayName);
     }
 
     // ============================================================
-    // 🔹 8. Cập nhật username lên Firestore
-    private void updateUsernameInFirestore(String newUsername) {
+    // 🔹 8. Cập nhật display name lên Firestore
+    private void updateDisplayNameInFirestore(String newDisplayName) {
         if (user == null) {
             enableDoneButton();
             return;
@@ -201,37 +195,37 @@ public class ChangeUsernameActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Document đã tồn tại, chỉ update username
+                        // Document đã tồn tại, chỉ update name (displayName)
                         Map<String, Object> updates = new HashMap<>();
-                        updates.put("username", newUsername);
+                        updates.put("name", newDisplayName);
 
                         db.collection("users").document(userId)
                                 .update(updates)
                                 .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(this, "Username đã được cập nhật thành công", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, "Tên hiển thị đã được cập nhật thành công", Toast.LENGTH_SHORT).show();
                                     Intent resultIntent = new Intent();
-                                    resultIntent.putExtra("username", newUsername);
+                                    resultIntent.putExtra("username", newDisplayName);
                                     setResult(RESULT_OK, resultIntent);
                                     finish();
                                 })
                                 .addOnFailureListener(e -> {
-                                    android.util.Log.e("CHANGE_USERNAME", "Lỗi cập nhật username", e);
-                                    Toast.makeText(this, "Lỗi cập nhật username: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                    android.util.Log.e("CHANGE_USERNAME", "Lỗi cập nhật tên hiển thị", e);
+                                    Toast.makeText(this, "Lỗi cập nhật tên hiển thị: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                     enableDoneButton();
                                 });
                     } else {
-                        // Document chưa tồn tại, tạo mới với đủ 3 fields
+                        // Document chưa tồn tại, tạo mới với đủ fields
                         Map<String, Object> newUserData = new HashMap<>();
                         newUserData.put("email", userEmail);
-                        newUserData.put("phone", ""); // Để trống, sẽ được cập nhật sau
-                        newUserData.put("username", newUsername);
+                        newUserData.put("name", newDisplayName);
+                        newUserData.put("photoUrl", ""); // Để trống, sẽ được cập nhật sau
 
                         db.collection("users").document(userId)
                                 .set(newUserData)
                                 .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(this, "Document tạo mới và username đã được thiết lập", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, "Document tạo mới và tên hiển thị đã được thiết lập", Toast.LENGTH_SHORT).show();
                                     Intent resultIntent = new Intent();
-                                    resultIntent.putExtra("username", newUsername);
+                                    resultIntent.putExtra("username", newDisplayName);
                                     setResult(RESULT_OK, resultIntent);
                                     finish();
                                 })

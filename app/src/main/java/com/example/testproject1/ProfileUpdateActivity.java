@@ -125,17 +125,18 @@ public class ProfileUpdateActivity extends AppCompatActivity {
                 }
         );
 
-        // Launcher cho change username
+        // Launcher cho change username (thực tế là change display name)
         changeUsernameResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    String newUsername = result.getData().getStringExtra("username");
-                    if (newUsername != null) {
-                        // Cập nhật UI với username mới
-                        tvUsername.setText(newUsername);
-                        tvUsernameDisplay.setText(newUsername);
-                        Toast.makeText(this, "Username đã được cập nhật", Toast.LENGTH_SHORT).show();
+                    String newDisplayName = result.getData().getStringExtra("username");
+                    if (newDisplayName != null) {
+                        // Cập nhật UI với tên hiển thị mới
+                        tvUsername.setText(newDisplayName);
+                        tvUsernameDisplay.setText(newDisplayName);
+                        tvDisplayName.setText(newDisplayName);
+                        Toast.makeText(this, "Tên hiển thị đã được cập nhật", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -161,16 +162,14 @@ public class ProfileUpdateActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {
-                        // Hiển thị tên
-                        String displayName = document.getString("displayName");
-                        if (displayName == null) displayName = document.getString("name");
+                        // Hiển thị tên (đọc từ field "name")
+                        String displayName = document.getString("name");
+                        if (displayName == null) displayName = document.getString("displayName"); // fallback cũ
                         tvDisplayName.setText(displayName != null ? displayName : "User");
 
-                        // Hiển thị username
-                        String username = document.getString("username");
-                        if (username == null) username = document.getString("name");
-                        tvUsername.setText(username != null ? username : "username");
-                        tvUsernameDisplay.setText(username != null ? username : "username");
+                        // Hiển thị username (cũng dùng field "name")
+                        tvUsername.setText(displayName != null ? displayName : "username");
+                        tvUsernameDisplay.setText(displayName != null ? displayName : "username");
 
                         // Hiển thị password mask
                         tvPasswordMask.setText("••••••••");
