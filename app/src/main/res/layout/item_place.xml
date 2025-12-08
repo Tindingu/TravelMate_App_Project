@@ -13,19 +13,24 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/infoContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:layout_toStartOf="@id/btnFavorite"> <TextView
-            android:id="@+id/tvPlaceName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Place Name"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="#000"/>
+            android:layout_toStartOf="@id/btnFavorite">
 
+            <!-- Tên -->
+            <TextView
+                android:id="@+id/tvPlaceName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Place Name"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#000"/>
+
+            <!-- Địa chỉ -->
             <TextView
                 android:id="@+id/tvPlaceAddress"
                 android:layout_width="match_parent"
@@ -35,15 +40,39 @@
                 android:maxLines="2"
                 android:ellipsize="end"/>
 
-            <TextView
-                android:id="@+id/tvPlaceRating"
-                android:layout_width="wrap_content"
+            <!-- ⭐ Rating + Đường đi -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="4.5 ⭐"
-                android:layout_marginTop="4dp"
-                android:textColor="#333"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="6dp">
+
+                <TextView
+                    android:id="@+id/tvPlaceRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4.5 ⭐"
+                    android:textColor="#333"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/btnDirection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đường đi >"
+                    android:textColor="#1E88E5"
+                    android:textStyle="bold"
+                    android:padding="4dp"/>
+            </LinearLayout>
+
         </LinearLayout>
 
+        <!-- ❤️ FAVORITE BUTTON -->
         <ImageView
             android:id="@+id/btnFavorite"
             android:layout_width="40dp"
@@ -53,5 +82,7 @@
             android:layout_marginEnd="8dp"
             android:padding="8dp"
             android:src="@drawable/ic_heart_outline"
-            app:tint="#F44336"/> </RelativeLayout>
+            app:tint="#F44336"/>
+    </RelativeLayout>
+
 </androidx.cardview.widget.CardView>

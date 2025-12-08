@@ -1,5 +1,7 @@
 package com.example.testproject1;
 
+import android.util.Log;
+
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,17 +28,22 @@ public class GeminiService {
         OkHttpClient client = new OkHttpClient();
 
         try {
+            // Prompt mạnh
+            String strictPrompt =
+                    "Hãy phân tích câu sau và TRẢ VỀ JSON THUẦN (chỉ JSON, không markdown, không giải thích).\n" +
+                            "JSON phải có dạng:\n" +
+                            "{ \"category\": \"cafe\", \"location\": \"Hồ Hoàn Kiếm Hà Nội\", \"radius\": 2500 }\n" +
+                            "YÊU CẦU:\n" +
+                            "- Luôn luôn trả JSON HỢP LỆ.\n" +
+                            "-  phải đúng chuẩn tag của OpenStreetMap.\n" +
+                            "- category: phải là loại địa điểm (cafe, restaurant, bar…)\n" +
+                            "- location: tên khu vực\n" +
+                            "- radius: số mét (int)\n\n" +
+                            "Câu của người dùng: " + query;
+
             JSONObject userMsg = new JSONObject();
             userMsg.put("role", "user");
-            userMsg.put("parts", new JSONArray().put(
-                    new JSONObject().put(
-                            "text",
-                            "Hãy phân tích câu sau và trả về JSON dạng:\n" +
-                                    "{ \"category\":\"cafe\", \"location\":\"Hồ Hoàn Kiếm Hà Nội\", \"radius\":2500 }\n" +
-                                    "Câu: " + query +
-                                    "\nCHỈ TRẢ JSON. KHÔNG GIẢI THÍCH."
-                    )
-            ));
+            userMsg.put("parts", new JSONArray().put(new JSONObject().put("text", strictPrompt)));
 
             JSONObject bodyJson = new JSONObject();
             bodyJson.put("contents", new JSONArray().put(userMsg));
@@ -61,8 +68,7 @@ public class GeminiService {
                 public void onResponse(Call call, Response response) {
                     try {
                         String raw = response.body().string();
-
-                        android.util.Log.d("GEMINI_RAW", raw);
+                        Log.d("GEMINI_RAW", raw);
 
                         JSONObject json = new JSONObject(raw);
 
@@ -74,13 +80,17 @@ public class GeminiService {
                                 .getJSONObject(0)
                                 .getString("text");
 
-                        // remove markdown ```json ```
-                        String clean = text
-                                .replace("```json", "")
-                                .replace("```", "")
-                                .trim();
+                        // Tách JSON bằng regex (trích mọi phần nằm trong {...})
+                        String extractedJson = text.replaceAll("(?s).*?(\\{.*?\\}).*", "$1");
 
-                        JSONObject result = new JSONObject(clean);
+                        // Fix lỗi JSON cơ bản
+                        extractedJson = extractedJson.trim()
+                                .replace("“", "\"")
+                                .replace("”", "\"")
+                                .replace("‘", "\"")
+                                .replace("’", "\"");
+
+                        JSONObject result = new JSONObject(extractedJson);
 
                         callback.onSuccess(result);
 
@@ -94,4 +104,5 @@ public class GeminiService {
             callback.onError(e.getMessage());
         }
     }
+
 }

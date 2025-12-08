@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:text="Bộ lọc"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Rating -->
+    <TextView android:text="Đánh giá tối thiểu" />
+    <SeekBar
+        android:id="@+id/seekRating"
+        android:max="50"/>
+    <TextView android:id="@+id/tvRatingValue" android:text="≥ 3.0"/>
+
+    <!-- Distance -->
+    <TextView
+        android:text="Khoảng cách tối đa (km)"
+        android:layout_marginTop="16dp"/>
+    <SeekBar
+        android:id="@+id/seekDistance"
+        android:max="20"/>
+    <TextView android:id="@+id/tvDistanceValue" android:text="≤ 5 km"/>
+
+    <!-- Apply button -->
+    <Button
+        android:id="@+id/btnApplyFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Áp dụng bộ lọc"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>

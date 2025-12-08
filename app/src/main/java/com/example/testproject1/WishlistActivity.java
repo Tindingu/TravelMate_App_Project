@@ -47,10 +47,19 @@ public class WishlistActivity extends AppCompatActivity {
         rvWishlist.setLayoutManager(new LinearLayoutManager(this));
         wishlist = new ArrayList<>();
 
-        adapter = new PlaceAdapter(wishlist,
-                place -> { /* Click item -> Có thể mở chi tiết */ },
-                place -> removeFromWishlist(place) // Click tim -> Xóa
+        adapter = new PlaceAdapter(
+                wishlist,
+
+                // 1. Click item
+                place -> { /* mở chi tiết hoặc zoom map nếu muốn */ },
+
+                // 2. Click tim → remove
+                place -> removeFromWishlist(place),
+
+                // 3. Click "Đường đi >" → Không dùng trong wishlist
+                place -> { }
         );
+
         rvWishlist.setAdapter(adapter);
 
         // Setup Navigation

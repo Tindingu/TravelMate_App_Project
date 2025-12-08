@@ -1,27 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:padding="10dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- Avatar -->
+    <!-- AVATAR -->
     <ImageView
         android:id="@+id/imgAvatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:background="@drawable/avatar_circle_bg"
         android:scaleType="centerCrop"
         android:src="@drawable/avttest"
-        android:background="@drawable/avatar_circle_bg"
         android:layout_marginRight="10dp"/>
 
-    <!-- Vùng chứa Tên, Sao, Nội dung, Ảnh -->
+    <!-- MAIN CONTENT -->
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content">
 
-        <!-- Row: User Name + Rating -->
+        <!-- Username + Rating -->
         <LinearLayout
             android:orientation="horizontal"
             android:gravity="center_vertical"
@@ -31,52 +32,120 @@
             <TextView
                 android:id="@+id/tvUser"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:text="Tên người dùng"
                 android:textColor="#000"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
             <RatingBar
                 android:id="@+id/ratingUser"
                 android:numStars="5"
                 android:stepSize="1"
-                android:rating="4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:progressDrawable="@drawable/rating_star"
                 android:scaleX="0.6"
                 android:scaleY="0.6"
-                android:progressDrawable="@drawable/rating_star"
-                android:isIndicator="true"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <!-- Time -->
-        <TextView
-            android:id="@+id/tvTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2 giờ trước"
-            android:textColor="#777"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp"/>
-
-        <!-- Message -->
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nội dung bình luận..."
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
-
-        <!-- MULTI IMAGE LIST -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCommentImages"
+        <!-- TIME + LIKE + DISLIKE -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="6dp"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+
+            <!-- TIME -->
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 giờ trước"
+                android:textSize="12sp"
+                android:textColor="#777" />
+
+            <!-- SPACE ĐẨY QUA PHẢI -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- LIKE -->
+            <LinearLayout
+                android:id="@+id/btnLike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:id="@+id/icLike"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/like" />
+
+                <TextView
+                    android:id="@+id/tvLikeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="13sp"
+                    android:textColor="#555"
+                    android:layout_marginLeft="4dp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="1dp" />
+
+            <!-- DISLIKE -->
+            <LinearLayout
+                android:id="@+id/btnDislike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="4dp">
+
+                <ImageView
+                    android:id="@+id/icDislike"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/dislike" />
+
+                <TextView
+                    android:id="@+id/tvDislikeCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="13sp"
+                    android:textColor="#555"
+                    android:layout_marginLeft="4dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- MESSAGE -->
+        <TextView
+            android:id="@+id/tvMessage"
+            android:text="Nội dung bình luận..."
+            android:textSize="14sp"
+            android:textColor="#000"
+            android:layout_marginTop="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- MULTI IMAGES -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCommentImages"
+            android:layout_marginTop="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:visibility="gone"/>
 
     </LinearLayout>

@@ -2,10 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 🔹 HEADER NẰM TRÊN CÙNG - CLICK ĐƯỢC -->
-
-
-    <!-- 🔹 NỘI DUNG SCROLL -->
+    <!-- 🔹 HEADER NẰM TRÊN CÙNG -->
     <LinearLayout
         android:id="@+id/headerBar"
         android:layout_width="match_parent"
@@ -20,7 +17,6 @@
             android:id="@+id/ivBack"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:contentDescription="Back"
             android:padding="6dp"
             android:rotation="270"
             android:src="@drawable/ic_chevron_up" />
@@ -44,10 +40,11 @@
             android:src="@drawable/ic_ring" />
     </LinearLayout>
 
+    <!-- 🔹 SCROLLABLE CONTENT -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="93dp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -56,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- ẢNH QUÁN -->
+            <!-- ẢNH -->
             <ImageView
                 android:id="@+id/ivPlaceImage"
                 android:layout_width="match_parent"
@@ -64,7 +61,7 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/sample_place" />
 
-            <!-- TÊN QUÁN -->
+            <!-- TÊN -->
             <TextView
                 android:id="@+id/tvPlaceName"
                 android:textSize="22sp"
@@ -82,15 +79,38 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- RATING -->
+            <!-- ⭐ RATING QUÁN -->
             <TextView
                 android:id="@+id/tvPlaceRating"
+                android:text="⭐ 4.5"
                 android:textSize="16sp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- COMMENTS LIST -->
+            <!-- ⭐ USER RATING -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Đánh giá của bạn:"
+                    android:textSize="15sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <RatingBar
+                    android:id="@+id/ratingUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="1" />
+            </LinearLayout>
+
+            <!-- DANH SÁCH COMMENT -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvComments"
                 android:layout_width="match_parent"
@@ -99,16 +119,21 @@
 
             <!-- KHUNG COMMENT -->
             <LinearLayout
+                android:id="@+id/commentInputBox"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <!-- PREVIEW NHIỀU ẢNH -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvPreviewImages"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:visibility="gone" />
 
+                <!-- INPUT -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
@@ -137,6 +162,7 @@
                         android:layout_height="40dp"
                         android:padding="6dp" />
                 </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>

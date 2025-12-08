@@ -4,8 +4,11 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -42,7 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private FirebaseUser user;
-
+    private TextView  tvPoint;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +59,7 @@ public class ProfileActivity extends AppCompatActivity {
         loadUserData();
         setupLogoutButton();
         setupBackButton();
-        setupUserChart();
+        loadUserStats();
     }
 
     // ============================================================
@@ -87,6 +90,7 @@ public class ProfileActivity extends AppCompatActivity {
         ivBack = findViewById(R.id.ivBack);
         btnLogout = findViewById(R.id.btnLogout);
         barChart = findViewById(R.id.barChartProfileStats);
+        tvPoint=findViewById(R.id.tvPoints);
     }
 
     // ============================================================
@@ -122,8 +126,6 @@ public class ProfileActivity extends AppCompatActivity {
                             tvJoinDate.setText("Tham gia gần đây");
                         }
 
-                        // 🔸 Hiển thị loại thành viên
-                        tvMemberType.setText("Member Gold");
                     }
                 })
                 .addOnFailureListener(e -> {
@@ -157,12 +159,12 @@ public class ProfileActivity extends AppCompatActivity {
 
     // ============================================================
     // 🔹 8. Biểu đồ thống kê người dùng
-    private void setupUserChart() {
+    private void setupUserChart(int totalLikes,int totalDislikes,int totalComments,int totalPlaces) {
         ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 120)); // Likes
-        entries.add(new BarEntry(1, 45));  // Comments
-        entries.add(new BarEntry(2, 60));  // Favorites
-        entries.add(new BarEntry(3, 20));  // Trips
+        entries.add(new BarEntry(0, totalLikes)); // Likes
+        entries.add(new BarEntry(1, totalDislikes));  // Dislikes
+        entries.add(new BarEntry(2, totalComments));  // Comments
+        entries.add(new BarEntry(3, totalPlaces));  // totalPlaces
 
         BarDataSet dataSet = new BarDataSet(entries, "Thống kê người dùng");
 
@@ -179,7 +181,7 @@ public class ProfileActivity extends AppCompatActivity {
         barData.setBarWidth(0.6f);
         barChart.setData(barData);
 
-        String[] labels = {"Likes", "Comments", "Favorites", "Trips"};
+        String[] labels = {"Likes", "Dislikes", "Comments", "TotalPlaces"};
         XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -205,4 +207,144 @@ public class ProfileActivity extends AppCompatActivity {
         barChart.animateY(1200, com.github.mikephil.charting.animation.Easing.EaseInOutQuad);
         barChart.invalidate();
     }
+    private void loadUserStats() {
+        String uid = auth.getUid();
+        if (uid == null) {
+            Log.e("USER_STATS", "UID NULL");
+            return;
+        }
+
+        Log.d("USER_STATS", "Bắt đầu load thống kê cho UID: " + uid);
+
+        db.collectionGroup("comments")
+                .get()
+                .addOnSuccessListener(snap -> {
+
+                    Log.d("USER_STATS", "Tổng số documents tìm thấy: " + snap.size());
+
+                    int totalLikes = 0;
+                    int totalDislikes = 0;
+                    int totalComments = 0;
+                    ArrayList<String> places = new ArrayList<>();
+
+                    for (var doc : snap.getDocuments()) {
+
+                        Log.d("USER_STATS", "-----------------------------------");
+                        Log.d("USER_STATS", "COMMENT DOC ID = " + doc.getId());
+
+                        CommentModel c = doc.toObject(CommentModel.class);
+                        if (c == null) {
+                            Log.e("USER_STATS", "CommentModel NULL → SKIP");
+                            continue;
+                        }
+
+                        String commentUid = doc.getString("uid");
+                        Log.d("USER_STATS", "UID trong comment = " + commentUid);
+
+                        // Chỉ tính comment của user này
+                        if (!uid.equals(commentUid)) {
+                            Log.d("USER_STATS", "UID không trùng, bỏ qua");
+                            continue;
+                        }
+
+                        Log.d("USER_STATS", "UID khớp → tính thống kê");
+
+                        totalComments++;
+
+                        Long likeCount = doc.getLong("likeCount");
+                        Long dislikeCount = doc.getLong("dislikeCount");
+
+                        Log.d("USER_STATS", "likeCount = " + likeCount);
+                        Log.d("USER_STATS", "dislikeCount = " + dislikeCount);
+
+                        totalLikes += (likeCount != null ? likeCount : 0);
+                        totalDislikes += (dislikeCount != null ? dislikeCount : 0);
+
+                        // Lấy ID của Place chứa comment
+                        String placeId = doc.getReference().getParent().getParent().getId();
+                        Log.d("USER_STATS", "Place chứa comment: " + placeId);
+
+                        if (!places.contains(placeId)) {
+                            places.add(placeId);
+                            Log.d("USER_STATS", "➕ Thêm Place vào danh sách");
+                        }
+                    }
+
+                    int totalPlaces = places.size();
+                    int totalPoints = (totalLikes * 5)
+                            + (totalComments * 2)
+                            - (totalDislikes * 3)
+                            + (totalPlaces * 1);
+
+                    updateUserTier(totalPoints);
+
+                    Log.d("USER_STATS", "============ KẾT QUẢ ============");
+                    Log.d("USER_STATS", "totalLikes     = " + totalLikes);
+                    Log.d("USER_STATS", "totalDislikes  = " + totalDislikes);
+                    Log.d("USER_STATS", "totalComments  = " + totalComments);
+                    Log.d("USER_STATS", "totalPlaces    = " + totalPlaces);
+                    Log.d("USER_STATS", "=================================");
+
+                    setupUserChart(totalLikes, totalDislikes, totalComments, totalPlaces);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("USER_STATS", "LỖI FIRESTORE: " + e.getMessage());
+                });
+    }
+    private void updateUserTier(int totalPoints) {
+
+        TextView tvMemberType = findViewById(R.id.tvMemberType);
+        TextView tvPoint = findViewById(R.id.tvPoints);
+        SeekBar progressTier = findViewById(R.id.seekLevelProgress);
+        TextView tvNextTier = findViewById(R.id.tvNextTier);
+        TextView tvProgressPercent = findViewById(R.id.tvProgressPercent);
+
+        // ----- Cập nhật điểm hiển thị -----
+        tvPoint.setText(String.valueOf(totalPoints));
+
+        // ----- Tính % tiến trình (max 300 là Gold) -----
+        int capped = Math.min(totalPoints, 300);
+        int percent = (int) ((capped / 300f) * 100);
+
+        progressTier.setProgress(percent);
+        tvProgressPercent.setText(percent + "%");
+
+        // ----- Logic phân cấp -----
+        String nextTierText = "";
+
+        if (totalPoints >= 300) {
+            // GOLD
+            tvMemberType.setText("Member Gold");
+            tvMemberType.setBackgroundResource(R.drawable.button_rounded_orange);
+            progressTier.setProgressTintList(getColorStateList(R.color.gold));
+
+            nextTierText = "Bạn đã đạt cấp cao nhất ";
+
+        } else if (totalPoints >= 20) {
+            // SILVER
+            tvMemberType.setText("Member Silver");
+            tvMemberType.setBackgroundResource(R.drawable.button_rounded_silver);
+            progressTier.setProgressTintList(getColorStateList(R.color.silver));
+
+            int needed = 300 - totalPoints;
+            nextTierText = "Còn " + needed + " điểm nữa để lên Gold";
+
+        } else {
+            // BRONZE
+            tvMemberType.setText("Member Bronze");
+            tvMemberType.setBackgroundResource(R.drawable.button_rounded_bronze);
+            progressTier.setProgressTintList(getColorStateList(R.color.bronze));
+
+            int needed = 20 - totalPoints;
+            nextTierText = "Còn " + needed + " điểm nữa để lên Silver";
+        }
+
+        tvNextTier.setText(nextTierText);
+    }
+
 }
+
+
+
+
+

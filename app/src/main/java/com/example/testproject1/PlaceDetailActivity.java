@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,39 +32,45 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1001;
 
+    // UI
     TextView tvName, tvAddress, tvRating;
-    ImageView ivPlaceImage, btnSendComment, btnAddImage;
+    ImageView ivPlaceImage, btnSendComment, btnAddImage, btnBack;
     EditText etComment;
     RatingBar ratingUser;
 
     RecyclerView rvComments, rvPreviewImages;
 
-    ArrayList<CommentModel> comments;
+    // DATA
+    ArrayList<CommentModel> comments = new ArrayList<>();
     CommentAdapter adapter;
 
     ArrayList<Uri> selectedImages = new ArrayList<>();
     PreviewImageAdapter previewAdapter;
 
+    // FIREBASE
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
 
+    // PLACE INFO
     String placeId, name, address;
-    double rating, lat, lon;
-    ImageView btnBack;
+    double rating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_detail);
 
+        // Nhận dữ liệu từ Intent
         placeId = getIntent().getStringExtra("id");
-        name = getIntent().getStringExtra("name");
+        name    = getIntent().getStringExtra("name");
         address = getIntent().getStringExtra("address");
-        rating = getIntent().getDoubleExtra("rating", 0);
+        rating  = getIntent().getDoubleExtra("rating", 0);
 
         initViews();
         setupPreviewImageList();
-        loadComments();
+        loadComments();          // load realtime
+        calculateRatingAverage(); // cập nhật rating trung bình
+
         btnAddImage.setOnClickListener(v -> openGallery());
         btnSendComment.setOnClickListener(v -> sendComment());
         btnBack.setOnClickListener(v -> finish());
@@ -82,22 +87,23 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
         btnSendComment = findViewById(R.id.btnSendComment);
         btnAddImage = findViewById(R.id.btnAddImage);
+        btnBack = findViewById(R.id.ivBack);
 
         rvComments = findViewById(R.id.rvComments);
         rvPreviewImages = findViewById(R.id.rvPreviewImages);
 
+        // UI
+        tvName.setText(name);
+        tvAddress.setText(address);
+        tvRating.setText("⭐ " + rating);
+
         Glide.with(this).load(R.drawable.sample_place).into(ivPlaceImage);
 
-        comments = new ArrayList<>();
-        adapter = new CommentAdapter(comments);
+        // Adapter — truyền placeId để LIKE/DISLIKE hoạt động
+        adapter = new CommentAdapter(comments, placeId);
         rvComments.setLayoutManager(new LinearLayoutManager(this));
         rvComments.setAdapter(adapter);
-
-         btnBack = findViewById(R.id.ivBack);
-        Log.d("BACK_DEBUG", "btnBack = " + btnBack);
-
     }
-
 
     private void setupPreviewImageList() {
         rvPreviewImages.setLayoutManager(
@@ -107,12 +113,12 @@ public class PlaceDetailActivity extends AppCompatActivity {
         previewAdapter = new PreviewImageAdapter(selectedImages, pos -> {
             selectedImages.remove(pos);
             previewAdapter.notifyDataSetChanged();
-            if (selectedImages.isEmpty()) rvPreviewImages.setVisibility(View.GONE);
+            if (selectedImages.isEmpty())
+                rvPreviewImages.setVisibility(View.GONE);
         });
 
         rvPreviewImages.setAdapter(previewAdapter);
     }
-
 
     private void openGallery() {
         Intent I = new Intent(Intent.ACTION_GET_CONTENT);
@@ -129,9 +135,8 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
             if (data.getClipData() != null) {
                 int count = data.getClipData().getItemCount();
-                for (int i = 0; i < count; i++) {
+                for (int i = 0; i < count; i++)
                     selectedImages.add(data.getClipData().getItemAt(i).getUri());
-                }
             } else if (data.getData() != null) {
                 selectedImages.add(data.getData());
             }
@@ -143,7 +148,6 @@ public class PlaceDetailActivity extends AppCompatActivity {
         }
     }
 
-
     private File uriToFile(Uri uri) {
         try {
             InputStream input = getContentResolver().openInputStream(uri);
@@ -154,9 +158,8 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
             byte[] buffer = new byte[1024];
             int len;
-            while ((len = input.read(buffer)) > 0) {
+            while ((len = input.read(buffer)) > 0)
                 out.write(buffer, 0, len);
-            }
 
             out.close();
             input.close();
@@ -168,23 +171,29 @@ public class PlaceDetailActivity extends AppCompatActivity {
         }
     }
 
-
     private void loadComments() {
         db.collection("places")
                 .document(placeId)
                 .collection("comments")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
+
                     if (value == null) return;
 
                     comments.clear();
-                    value.getDocuments().forEach(d ->
-                            comments.add(d.toObject(CommentModel.class))
-                    );
+
+                    value.getDocuments().forEach(d -> {
+                        CommentModel c = d.toObject(CommentModel.class);
+                        if (c == null) return;
+
+                        c.setId(d.getId());   // cần thiết cho LIKE/DISLIKE
+                        comments.add(c);
+                    });
+
                     adapter.notifyDataSetChanged();
+                    calculateRatingAverage();
                 });
     }
-
 
     private void sendComment() {
         String msg = etComment.getText().toString().trim();
@@ -194,18 +203,20 @@ public class PlaceDetailActivity extends AppCompatActivity {
         }
 
         int ratingValue = (int) ratingUser.getRating();
-        String user = auth.getCurrentUser() != null ? auth.getCurrentUser().getEmail() : "Ẩn danh";
+        String username = auth.getCurrentUser() != null ? auth.getCurrentUser().getDisplayName() : "Ẩn danh";
+        String uid = auth.getUid();  // >>>> UID thêm vào đây
         long time = System.currentTimeMillis();
 
         if (selectedImages.isEmpty()) {
-            pushComment(new CommentModel(user, msg, time, ratingValue, new ArrayList<>()));
+            CommentModel c = new CommentModel(username, msg, time, ratingValue, new ArrayList<>());
+            c.setUid(uid); // <<< thêm UID
+            pushComment(c);
         } else {
-            uploadImagesThenSend(user, msg, time, ratingValue);
+            uploadImagesThenSend(username, uid, msg, time, ratingValue);
         }
     }
 
-
-    private void uploadImagesThenSend(String user, String msg, long time, int ratingValue) {
+    private void uploadImagesThenSend(String username, String uid, String msg, long time, int ratingValue) {
 
         ArrayList<String> uploadedUrls = new ArrayList<>();
 
@@ -238,18 +249,19 @@ public class PlaceDetailActivity extends AppCompatActivity {
                                             uploadedUrls.add(url);
 
                                             if (uploadedUrls.size() == selectedImages.size()) {
-                                                pushComment(new CommentModel(
-                                                        user, msg, time, ratingValue, uploadedUrls
-                                                ));
+                                                CommentModel c = new CommentModel(
+                                                        username, msg, time, ratingValue, uploadedUrls
+                                                );
+                                                c.setUid(uid); // <<< thêm UID
+                                                pushComment(c);
                                             }
                                         }
 
                                         @Override
                                         public void onError(String err) {
-                                            runOnUiThread(() ->
-                                                    Toast.makeText(PlaceDetailActivity.this,
-                                                            "Upload lỗi: " + err,
-                                                            Toast.LENGTH_SHORT).show());
+                                            Toast.makeText(PlaceDetailActivity.this,
+                                                    "Upload lỗi: " + err,
+                                                    Toast.LENGTH_SHORT).show();
                                         }
                                     }
                             );
@@ -257,17 +269,14 @@ public class PlaceDetailActivity extends AppCompatActivity {
 
                         @Override
                         public void onError(String err) {
-                            runOnUiThread(() ->
-                                    Toast.makeText(PlaceDetailActivity.this,
-                                            "Không lấy được presigned URL: " + err,
-                                            Toast.LENGTH_SHORT).show()
-                            );
+                            Toast.makeText(PlaceDetailActivity.this,
+                                    "Không lấy được presigned URL: " + err,
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
             );
         }
     }
-
 
     private void pushComment(CommentModel c) {
         db.collection("places")
@@ -275,6 +284,7 @@ public class PlaceDetailActivity extends AppCompatActivity {
                 .collection("comments")
                 .add(c)
                 .addOnSuccessListener(a -> {
+
                     etComment.setText("");
                     ratingUser.setRating(0);
 
@@ -285,6 +295,40 @@ public class PlaceDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Đã gửi bình luận!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Lưu thất bại!", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, "Lưu thất bại!", Toast.LENGTH_SHORT).show()
+                );
+    }
+
+    private void calculateRatingAverage() {
+
+        db.collection("places")
+                .document(placeId)
+                .collection("comments")
+                .get()
+                .addOnSuccessListener(snap -> {
+
+                    int total = 0, count = 0;
+
+                    for (var doc : snap.getDocuments()) {
+                        Long r = doc.getLong("rating");
+                        if (r != null) {
+                            total += r;
+                            count++;
+                        }
+                    }
+
+                    if (count == 0) {
+                        tvRating.setText("⭐ Chưa có đánh giá");
+                        return;
+                    }
+
+                    double avg = Math.round((total * 1.0 / count) * 10) / 10.0;
+
+                    tvRating.setText("⭐ " + avg);
+
+                    db.collection("places")
+                            .document(placeId)
+                            .update("ratingAvg", avg);
+                });
     }
 }

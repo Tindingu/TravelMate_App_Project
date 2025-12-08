@@ -119,14 +119,9 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
 
     private ArrayList<PlaceModel> list;
 
-    // Listener 1: Bấm vào item → chuyển trang / zoom map
     private OnItemClickListener itemListener;
-
-    // Listener 2: Bấm vào tim → add/remove wishlist
     private OnFavoriteClickListener favListener;
-
-    public PlaceAdapter(ArrayList<PlaceModel> placeList, OnItemClickListener onItemClickListener) {
-    }
+    private OnDirectionClickListener directionListener;
 
     // ----------------------------
     // INTERFACES
@@ -139,20 +134,26 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
         void onFavoriteClick(PlaceModel place);
     }
 
+    public interface OnDirectionClickListener {
+        void onDirectionClick(PlaceModel place);
+    }
+
     // ----------------------------
-    // CONSTRUCTOR KẾT HỢP
+    // CONSTRUCTOR ĐẦY ĐỦ
     // ----------------------------
     public PlaceAdapter(ArrayList<PlaceModel> list,
                         OnItemClickListener itemListener,
-                        OnFavoriteClickListener favListener) {
+                        OnFavoriteClickListener favListener,
+                        OnDirectionClickListener directionListener) {
 
         this.list = list;
         this.itemListener = itemListener;
         this.favListener = favListener;
+        this.directionListener = directionListener;
     }
 
     // ----------------------------
-    // TẠO VIEW HOLDER
+    // CREATE VIEW HOLDER
     // ----------------------------
     @NonNull
     @Override
@@ -163,40 +164,38 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     }
 
     // ----------------------------
-    // BIND DATA VÀ XỬ LÝ CLICK
+    // BIND DATA + HANDLE EVENTS
     // ----------------------------
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         PlaceModel place = list.get(position);
 
-        // Set data
         holder.tvName.setText(place.getName());
         holder.tvAddress.setText(place.getAddress());
         holder.tvRating.setText(String.format("%.1f ⭐", place.getRating()));
 
-        // ⭐ HIỂN THỊ TRÁI TIM
-        if (place.isFavorite()) {
-            holder.btnFavorite.setImageResource(R.drawable.ic_heart_filled);
-        } else {
-            holder.btnFavorite.setImageResource(R.drawable.ic_heart_outline);
-        }
+        // ★ HIỆN TIM ĐÚNG TRẠNG THÁI
+        holder.btnFavorite.setImageResource(
+                place.isFavorite() ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline
+        );
 
-        // ⭐ CLICK TRÁI TIM → ADD/REMOVE WISHLIST
+        // ★ CLICK TIM
         holder.btnFavorite.setOnClickListener(v -> {
             boolean newState = !place.isFavorite();
             place.setFavorite(newState);
 
-            // Cập nhật UI
             holder.btnFavorite.setImageResource(
                     newState ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline
             );
 
-            // Gọi callback về HomeActivity
             favListener.onFavoriteClick(place);
         });
 
-        // ⭐ CLICK ITEM → ZOOM MAP + MỞ PlaceDetailActivity
+        // ★ NHẤN VÀO ITEM → mở detail / zoom map
         holder.itemView.setOnClickListener(v -> itemListener.onItemClick(place));
+
+        // ★ NHẤN "Đường đi>"
+        holder.tvDirection.setOnClickListener(v -> directionListener.onDirectionClick(place));
     }
 
     @Override
@@ -208,7 +207,8 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     // VIEW HOLDER
     // ----------------------------
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvAddress, tvRating;
+
+        TextView tvName, tvAddress, tvRating, tvDirection;
         ImageView btnFavorite;
 
         public ViewHolder(@NonNull View itemView) {
@@ -217,7 +217,11 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
             tvName = itemView.findViewById(R.id.tvPlaceName);
             tvAddress = itemView.findViewById(R.id.tvPlaceAddress);
             tvRating = itemView.findViewById(R.id.tvPlaceRating);
-            btnFavorite = itemView.findViewById(R.id.btnFavorite); // ⭐ ánh xạ nút tim
+
+            btnFavorite = itemView.findViewById(R.id.btnFavorite);
+
+            // ⭐ dòng Đường đi mà bạn muốn thêm
+            tvDirection = itemView.findViewById(R.id.btnDirection);
         }
     }
 }
