@@ -134,6 +134,19 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navChat"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="18dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/icChat"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_chat" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/navCalendar"
             android:layout_width="50dp"
             android:layout_height="50dp"

@@ -38,6 +38,9 @@
         <activity android:name=".ForgotPasswordActivity" />
         <activity android:name=".WishlistActivity" />
         <activity android:name=".PlaceDetailActivity" />
+        <activity android:name=".ChatListActivity" />
+        <activity android:name=".GroupChatActivity" />
+        <activity android:name=".GroupDashboardActivity" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
