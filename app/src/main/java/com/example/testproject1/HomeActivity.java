@@ -65,7 +65,7 @@ import java.util.Set;
 public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     // UI
-    LinearLayout navHome, navBookmark, navCalendar, navNotification;
+    LinearLayout navHome, navBookmark, navChat, navCalendar, navNotification;
     TextView tvHello;
     ImageView ivProfile, ivSearchBtn;
     EditText etSearch;
@@ -130,6 +130,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initViews() {
         navHome = findViewById(R.id.navHome);
         navBookmark = findViewById(R.id.navBookmark);
+        navChat = findViewById(R.id.navChat);
         navCalendar = findViewById(R.id.navCalendar);
         navNotification = findViewById(R.id.navNotification);
 
@@ -554,6 +555,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         navHome.setOnClickListener(this::onNavClick);
         navBookmark.setOnClickListener(this::onNavClick);
+        navChat.setOnClickListener(this::onNavClick);
         navCalendar.setOnClickListener(this::onNavClick);
         navNotification.setOnClickListener(this::onNavClick);
     }
@@ -565,12 +567,16 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (v.getId() == R.id.navBookmark) {
             startActivity(new Intent(this, WishlistActivity.class));
             overridePendingTransition(0, 0);
+        } else if (v.getId() == R.id.navChat) {
+            startActivity(new Intent(this, ChatListActivity.class));
+            overridePendingTransition(0, 0);
         }
     }
 
     private void resetNav() {
         navHome.setBackground(null);
         navBookmark.setBackground(null);
+        navChat.setBackground(null);
         navCalendar.setBackground(null);
         navNotification.setBackground(null);
     }
