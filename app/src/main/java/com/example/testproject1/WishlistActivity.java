@@ -136,5 +136,14 @@ public class WishlistActivity extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(0, 0);
         });
+        navCalendar.setOnClickListener(v -> {
+            Intent intent = new Intent(WishlistActivity.this, MyTripsActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0); // Chuyển cảnh mượt
+            finish(); // Đóng Wishlist hiện tại (tùy chọn, nhưng tốt để tránh back stack rối)
+        });
+        navNotification.setOnClickListener(v -> {
+            Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+        });
     }
 }

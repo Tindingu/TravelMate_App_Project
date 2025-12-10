@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:minWidth="300dp">
+
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thêm vào lịch trình"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/tvLabelTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn chuyến đi:"
+        android:textStyle="bold"/>
+
+    <Spinner
+        android:id="@+id/spTrip"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="12dp"
+        android:background="@android:drawable/btn_dropdown"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etVisitDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Ngày (dd/mm)"
+            android:inputType="date"
+            android:focusable="false"/>
+
+        <EditText
+            android:id="@+id/etVisitTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Giờ (hh:mm)"
+            android:inputType="time"
+            android:focusable="false"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/etNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ghi chú (VD: Mua vé trước)"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btnConfirmAdd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lưu địa điểm"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFF"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>

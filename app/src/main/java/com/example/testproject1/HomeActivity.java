@@ -87,7 +87,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     // GPS
     FusedLocationProviderClient fusedLocationClient;
 
-    private static final String API_KEY_GEMINI = "AIzaSyDJ4HUU4OxC4EAKfuo7Zp-FEphSeceyWCY";
+    private static final String API_KEY_GEMINI = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -565,6 +565,14 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (v.getId() == R.id.navBookmark) {
             startActivity(new Intent(this, WishlistActivity.class));
             overridePendingTransition(0, 0);
+        }
+        else if (v.getId() == R.id.navCalendar) { // <--- THÊM ĐOẠN NÀY
+            startActivity(new Intent(this, MyTripsActivity.class));
+            overridePendingTransition(0, 0);
+        }
+        else if (v.getId() == R.id.navNotification) {
+            // Logic cho thông báo sau này
+            Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
         }
     }
 

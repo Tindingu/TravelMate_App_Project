@@ -38,6 +38,9 @@
         <activity android:name=".ForgotPasswordActivity" />
         <activity android:name=".WishlistActivity" />
         <activity android:name=".PlaceDetailActivity" />
+        <activity android:name=".MyTripsActivity"/>
+        <activity android:name=".TripDetailActivity"/>
+
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

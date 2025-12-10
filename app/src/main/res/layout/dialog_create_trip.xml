@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etTripName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tên chuyến đi (vd: Đà Lạt)" />
+
+    <EditText
+        android:id="@+id/etStartDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ngày bắt đầu (dd/mm/yyyy)"
+        android:inputType="date"/>
+
+    <EditText
+        android:id="@+id/etEndDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ngày kết thúc (dd/mm/yyyy)"
+        android:inputType="date"/>
+</LinearLayout>

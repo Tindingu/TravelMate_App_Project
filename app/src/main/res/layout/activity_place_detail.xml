@@ -1,6 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- 🔹 HEADER NẰM TRÊN CÙNG -->
     <LinearLayout
@@ -166,6 +167,16 @@
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
 
+    </ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnAddToTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_calendar"
+        app:backgroundTint="#FF9800"
+        app:tint="@android:color/white"
+        android:contentDescription="Add to trip" />
 </FrameLayout>
