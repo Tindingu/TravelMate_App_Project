@@ -17,9 +17,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +34,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class PlaceDetailActivity extends AppCompatActivity {
+public class PlaceDetailActivity extends AppCompatActivity
+        implements OnMapReadyCallback{
 
     private static final int PICK_IMAGE_REQUEST = 1001;
 
@@ -54,7 +61,9 @@ public class PlaceDetailActivity extends AppCompatActivity {
     // PLACE INFO
     String placeId, name, address;
     double rating;
-
+    private GoogleMap mMap;
+    private double lat, lon;
+    private String placeName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +75,10 @@ public class PlaceDetailActivity extends AppCompatActivity {
         address = getIntent().getStringExtra("address");
         rating  = getIntent().getDoubleExtra("rating", 0);
 
+        lat = getIntent().getDoubleExtra("lat", 0);
+        lon = getIntent().getDoubleExtra("lon", 0);
+        placeName = getIntent().getStringExtra("name");
+
         initViews();
         setupPreviewImageList();
         loadComments();          // load realtime
@@ -74,10 +87,18 @@ public class PlaceDetailActivity extends AppCompatActivity {
         btnAddImage.setOnClickListener(v -> openGallery());
         btnSendComment.setOnClickListener(v -> sendComment());
         btnBack.setOnClickListener(v -> finish());
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.placeMap);
+
+        if (mapFragment != null) {
+            mapFragment.getMapAsync((OnMapReadyCallback) this);
+        }
+
     }
 
     private void initViews() {
-        ivPlaceImage = findViewById(R.id.ivPlaceImage);
+//        ivPlaceImage = findViewById(R.id.ivPlaceImage);
         tvName = findViewById(R.id.tvPlaceName);
         tvAddress = findViewById(R.id.tvPlaceAddress);
         tvRating = findViewById(R.id.tvPlaceRating);
@@ -97,7 +118,7 @@ public class PlaceDetailActivity extends AppCompatActivity {
         tvAddress.setText(address);
         tvRating.setText("⭐ " + rating);
 
-        Glide.with(this).load(R.drawable.sample_place).into(ivPlaceImage);
+//        Glide.with(this).load(R.drawable.sample_place).into(ivPlaceImage);
 
         // Adapter — truyền placeId để LIKE/DISLIKE hoạt động
         adapter = new CommentAdapter(comments, placeId);
@@ -331,4 +352,23 @@ public class PlaceDetailActivity extends AppCompatActivity {
                             .update("ratingAvg", avg);
                 });
     }
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        LatLng placeLatLng = new LatLng(lat, lon);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLatLng, 16f));
+
+        mMap.addMarker(new MarkerOptions()
+                .position(placeLatLng)
+                .title(placeName));
+
+        // Tắt UI không cần thiết cho map nhỏ
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setScrollGesturesEnabled(false);
+        mMap.getUiSettings().setZoomGesturesEnabled(false);
+    }
+
 }

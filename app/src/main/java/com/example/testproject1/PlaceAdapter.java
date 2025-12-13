@@ -114,6 +114,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> {
 
@@ -168,35 +169,91 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     // ----------------------------
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         PlaceModel place = list.get(position);
 
+        // ===== TEXT =====
         holder.tvName.setText(place.getName());
         holder.tvAddress.setText(place.getAddress());
-        holder.tvRating.setText(String.format("%.1f ⭐", place.getRating()));
 
-        // ★ HIỆN TIM ĐÚNG TRẠNG THÁI
+        // ===== RATING (LUÔN BIND) =====
+        if (place.getRating() > 0) {
+            holder.tvRating.setText(
+                    String.format(Locale.getDefault(), "%.1f ⭐", place.getRating())
+            );
+        } else {
+            holder.tvRating.setText("Chưa có đánh giá");
+        }
+
+        // ===== FAVORITE ICON =====
         holder.btnFavorite.setImageResource(
-                place.isFavorite() ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline
+                place.isFavorite()
+                        ? R.drawable.ic_heart_filled
+                        : R.drawable.ic_heart_outline
         );
 
-        // ★ CLICK TIM
+        // ===== CLICK FAVORITE =====
         holder.btnFavorite.setOnClickListener(v -> {
             boolean newState = !place.isFavorite();
             place.setFavorite(newState);
 
             holder.btnFavorite.setImageResource(
-                    newState ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline
+                    newState
+                            ? R.drawable.ic_heart_filled
+                            : R.drawable.ic_heart_outline
             );
 
-            favListener.onFavoriteClick(place);
+            if (favListener != null) {
+                favListener.onFavoriteClick(place);
+            }
         });
 
-        // ★ NHẤN VÀO ITEM → mở detail / zoom map
-        holder.itemView.setOnClickListener(v -> itemListener.onItemClick(place));
+        // ===== CLICK ITEM =====
+        holder.itemView.setOnClickListener(v -> {
+            if (itemListener != null) {
+                itemListener.onItemClick(place);
+            }
+        });
 
-        // ★ NHẤN "Đường đi>"
-        holder.tvDirection.setOnClickListener(v -> directionListener.onDirectionClick(place));
+        // ===== CLICK DIRECTION =====
+        holder.tvDirection.setOnClickListener(v -> {
+            if (directionListener != null) {
+                directionListener.onDirectionClick(place);
+            }
+        });
     }
+
+//    @Override
+//    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+//        PlaceModel place = list.get(position);
+//
+//        holder.tvName.setText(place.getName());
+//        holder.tvAddress.setText(place.getAddress());
+//        holder.tvRating.setText(String.format("%.1f ⭐", place.getRating()));
+//
+//        // ★ HIỆN TIM ĐÚNG TRẠNG THÁI
+//        holder.btnFavorite.setImageResource(
+//                place.isFavorite() ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline
+//        );
+//
+//        // ★ CLICK TIM
+//        holder.btnFavorite.setOnClickListener(v -> {
+//            boolean newState = !place.isFavorite();
+//            place.setFavorite(newState);
+//
+//            holder.btnFavorite.setImageResource(
+//                    newState ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline
+//            );
+//
+//            favListener.onFavoriteClick(place);
+//        });
+//
+//        // ★ NHẤN VÀO ITEM → mở detail / zoom map
+//        holder.itemView.setOnClickListener(v -> itemListener.onItemClick(place));
+//
+//        // ★ NHẤN "Đường đi>"
+//        holder.tvDirection.setOnClickListener(v -> directionListener.onDirectionClick(place));
+//    }
 
     @Override
     public int getItemCount() {

@@ -54,12 +54,20 @@
             android:layout_height="wrap_content">
 
             <!-- ẢNH -->
-            <ImageView
-                android:id="@+id/ivPlaceImage"
+<!--            <ImageView-->
+<!--                android:id="@+id/ivPlaceImage"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="220dp"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                android:src="@drawable/sample_place" />-->
+            <!-- MAP -->
+            <fragment
+                android:id="@+id/placeMap"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/sample_place" />
+                />
 
             <!-- TÊN -->
             <TextView
