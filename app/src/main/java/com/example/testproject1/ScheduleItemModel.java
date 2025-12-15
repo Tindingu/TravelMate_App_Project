@@ -13,14 +13,14 @@ public class ScheduleItemModel implements Serializable {
     private double lat;
     private double lon;
 
-    private String visitDate;   // Ngày đi thăm (vd: 12/05/2024)
-    private String visitTime;   // Giờ đi thăm (vd: 09:00)
-    private String note;        // Ghi chú
-
+    private String visitDate;
+    private String visitTime;
+    private String note;
+    private String endTime;
     public ScheduleItemModel() {}
 
     // Constructor tiện lợi để tạo từ PlaceModel
-    public ScheduleItemModel(String itemId, String tripId, PlaceModel place, String visitDate, String visitTime) {
+    public ScheduleItemModel(String itemId, String tripId, PlaceModel place, String visitDate, String visitTime, String endTime) {
         this.itemId = itemId;
         this.tripId = tripId;
         this.placeId = place.getId();
@@ -30,6 +30,7 @@ public class ScheduleItemModel implements Serializable {
         this.lon = place.getLon();
         this.visitDate = visitDate;
         this.visitTime = visitTime;
+        this.endTime = endTime;
     }
 
     // Getter & Setter
@@ -59,7 +60,8 @@ public class ScheduleItemModel implements Serializable {
 
     public String getVisitTime() { return visitTime; }
     public void setVisitTime(String visitTime) { this.visitTime = visitTime; }
-
+    public String getEndTime() { return endTime; }
+    public void setEndTime(String endTime) { this.endTime = endTime; }
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
 }

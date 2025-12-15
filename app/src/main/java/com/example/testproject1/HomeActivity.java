@@ -62,6 +62,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
+import androidx.appcompat.app.AlertDialog;
+import java.util.Calendar;
+
 public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     // UI
@@ -75,7 +83,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     PlaceAdapter placeAdapter;
     ArrayList<PlaceModel> placeList;
     Set<String> wishlistIds = new HashSet<>();
-
+    List<TripModel> myTrips = new ArrayList<>();
     // Firebase + Map
     FirebaseAuth auth;
     FirebaseUser user;
@@ -87,7 +95,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     // GPS
     FusedLocationProviderClient fusedLocationClient;
 
-    private static final String API_KEY_GEMINI = "";
+    private static final String API_KEY_GEMINI = "AIzaSyBwpJsZDlM5UezcHuOIpCEXNf-UheGAENE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,9 +149,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         rvPlaces = findViewById(R.id.rvPlaces);
     }
 
-    // ============================================================
-    // ⭐ WISHLIST REALTIME
-    // ============================================================
     private void listenToWishlist() {
         if (user == null) return;
 
@@ -166,24 +171,15 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
     }
 
-    // ============================================================
-    // ⭐ SETUP LIST
-    // ============================================================
     private void setupRecyclerView() {
 
         placeList = new ArrayList<>();
         rvPlaces.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Hiệu ứng Snap căn giữa
         new PagerSnapHelper().attachToRecyclerView(rvPlaces);
 
-        // TẠO ADAPTER ĐẦY ĐỦ 3 CALLBACK
         placeAdapter = new PlaceAdapter(
                 placeList,
-
-                // ============================
-                // 1. CLICK ITEM → ZOOM MAP + DETAIL
-                // ============================
                 place -> {
                     if (mMap != null) {
                         LatLng loc = new LatLng(place.getLat(), place.getLon());
@@ -202,28 +198,12 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                     intent.putExtra("lon", place.getLon());
                     startActivity(intent);
                 },
-
-                // ============================
-                // 2. CLICK TIM → WISHLIST
-                // ============================
                 place -> {
                     if (place.isFavorite()) addToWishlist(place);
                     else removeFromWishlist(place);
                 },
-
-                // ============================
-                // 3. CLICK "Đường đi >"
-                // ============================
                 place -> {
-                    // Lấy vị trí hiện tại
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
                     fusedLocationClient.getLastLocation()
@@ -244,7 +224,8 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                                 requestRoute(startLat, startLon, endLat, endLon);
                             });
-                }
+                },
+                place -> showAddToTripDialog(place)
         );
 
         rvPlaces.setAdapter(placeAdapter);
@@ -295,11 +276,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-
-
-    // ============================================================
-    // ⭐ AI → NOMINATIM → OSM SEARCH
-    // ============================================================
     private void runAI(String text) {
         gpt.analyzeQuery(text, new GeminiService.GeminiCallback() {
             @Override
@@ -437,9 +413,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         queue.add(req);
     }
 
-    // ============================================================
-    // ⭐ WISHLIST
-    // ============================================================
     private void addToWishlist(PlaceModel place) {
         if (user == null) return;
         String docId = place.getName().replaceAll("[^a-zA-Z0-9]", "_");
@@ -454,7 +427,13 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         db.collection("users").document(user.getUid())
                 .collection("wishlist").document(docId)
-                .set(data);
+                .set(data)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(HomeActivity.this, "Đã thêm vào danh sách yêu thích ❤️", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(HomeActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void removeFromWishlist(PlaceModel place) {
@@ -463,12 +442,12 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         db.collection("users").document(user.getUid())
                 .collection("wishlist").document(docId)
-                .delete();
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(HomeActivity.this, "Đã xóa khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                });
     }
 
-    // ============================================================
-    // ⭐ USER INFO
-    // ============================================================
     private void setupUserProfile() {
         if (user != null) {
             db.collection("users").document(user.getUid()).get().addOnSuccessListener(s -> {
@@ -485,15 +464,11 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
     }
 
-    // ============================================================
-    // ⭐ GOOGLE MAP READY → AUTO ZOOM GPS
-    // ============================================================
     @Override
     public void onMapReady(GoogleMap gm) {
         mMap = gm;
         mMap.getUiSettings().setZoomControlsEnabled(true);
         getCurrentLocation();
-//        Test
         mMap.setOnMapClickListener(point -> {
             double startLat = 10.8450;
             double startLon = 106.7963;
@@ -509,9 +484,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    // ============================================================
-    // ⭐ LẤY GPS HIỆN TẠI
-    // ============================================================
     private void getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -546,9 +518,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    // ============================================================
-    // ⭐ NAV
-    // ============================================================
     private void setupBottomNav() {
         setActive(navHome);
 
@@ -566,12 +535,11 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(new Intent(this, WishlistActivity.class));
             overridePendingTransition(0, 0);
         }
-        else if (v.getId() == R.id.navCalendar) { // <--- THÊM ĐOẠN NÀY
+        else if (v.getId() == R.id.navCalendar) {
             startActivity(new Intent(this, MyTripsActivity.class));
             overridePendingTransition(0, 0);
         }
         else if (v.getId() == R.id.navNotification) {
-            // Logic cho thông báo sau này
             Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
         }
     }
@@ -587,4 +555,138 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         l.setBackgroundResource(R.drawable.nav_item_selected_bg);
     }
 
+    private void showAddToTripDialog(PlaceModel selectedPlace) {
+        if (user == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_to_trip, null);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+
+        Spinner spTrip = view.findViewById(R.id.spTrip);
+        EditText etDate = view.findViewById(R.id.etVisitDate);
+        EditText etStartTime = view.findViewById(R.id.etStartTime);
+        EditText etEndTime = view.findViewById(R.id.etEndTime);
+        EditText etNote = view.findViewById(R.id.etNote);
+        Button btnConfirm = view.findViewById(R.id.btnConfirmAdd);
+
+        List<String> tripNames = new ArrayList<>();
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tripNames);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spTrip.setAdapter(spinnerAdapter);
+
+        db.collection("trips").whereEqualTo("userId", user.getUid()).get()
+                .addOnSuccessListener(querySnapshot -> {
+                    myTrips.clear();
+                    tripNames.clear();
+                    for (DocumentSnapshot doc : querySnapshot) {
+                        TripModel trip = doc.toObject(TripModel.class);
+                        myTrips.add(trip);
+                        tripNames.add(trip.getName());
+                    }
+                    spinnerAdapter.notifyDataSetChanged();
+                    if (myTrips.isEmpty()) {
+                        Toast.makeText(this, "Bạn chưa có chuyến đi nào!", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+
+        etDate.setOnClickListener(v -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (view1, year, month, dayOfMonth) -> {
+                etDate.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        etStartTime.setOnClickListener(v -> showTimePicker(etStartTime));
+        etEndTime.setOnClickListener(v -> showTimePicker(etEndTime));
+
+        btnConfirm.setOnClickListener(v -> {
+            int pos = spTrip.getSelectedItemPosition();
+            if (pos < 0) return;
+
+            TripModel trip = myTrips.get(pos);
+            String date = etDate.getText().toString();
+            String sTime = etStartTime.getText().toString();
+            String eTime = etEndTime.getText().toString();
+            String note = etNote.getText().toString();
+
+            if (date.isEmpty() || sTime.isEmpty() || eTime.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ ngày giờ!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (convertTimeToMinutes(eTime) <= convertTimeToMinutes(sTime)) {
+                Toast.makeText(this, "Giờ kết thúc phải sau giờ bắt đầu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            checkConflictAndSave(trip.getTripId(), selectedPlace, date, sTime, eTime, note, dialog);
+        });
+
+        dialog.show();
+    }
+
+    private void checkConflictAndSave(String tripId, PlaceModel place, String date, String newStart, String newEnd, String note, AlertDialog dialog) {
+        db.collection("schedule")
+                .whereEqualTo("tripId", tripId)
+                .whereEqualTo("visitDate", date)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    boolean isConflict = false;
+                    int newS = convertTimeToMinutes(newStart);
+                    int newE = convertTimeToMinutes(newEnd);
+
+                    for (DocumentSnapshot doc : querySnapshot) {
+                        String existStart = doc.getString("visitTime");
+                        String existEnd = doc.getString("endTime");
+
+                        if (existEnd == null) continue;
+
+                        int oldS = convertTimeToMinutes(existStart);
+                        int oldE = convertTimeToMinutes(existEnd);
+
+                        if (newS < oldE && newE > oldS) {
+                            isConflict = true;
+                            Toast.makeText(this, "Bị trùng giờ với: " + doc.getString("placeName"), Toast.LENGTH_LONG).show();
+                            break;
+                        }
+                    }
+
+                    if (!isConflict) {
+                        saveToSchedule(tripId, place, date, newStart, newEnd, note, dialog);
+                    }
+                });
+    }
+
+    private void saveToSchedule(String tripId, PlaceModel place, String date, String start, String end, String note, AlertDialog dialog) {
+        String itemId = db.collection("schedule").document().getId();
+        ScheduleItemModel item = new ScheduleItemModel(itemId, tripId, place, date, start, end);
+        item.setNote(note);
+
+        db.collection("schedule").document(itemId).set(item)
+                .addOnSuccessListener(a -> {
+                    Toast.makeText(this, "Đã thêm vào lịch trình!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                });
+    }
+
+    private int convertTimeToMinutes(String timeStr) {
+        try {
+            String[] parts = timeStr.split(":");
+            return Integer.parseInt(parts[0]) * 60 + Integer.parseInt(parts[1]);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private void showTimePicker(EditText et) {
+        Calendar c = Calendar.getInstance();
+        new TimePickerDialog(this, (view, hourOfDay, minute) -> {
+            et.setText(String.format("%02d:%02d", hourOfDay, minute));
+        }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.testproject1;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -8,14 +10,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog; // Import Dialog
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class TripDetailActivity extends AppCompatActivity {
@@ -34,12 +41,10 @@ public class TripDetailActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // Ánh xạ View
         tvTitle = findViewById(R.id.tvTitle);
         rvSchedule = findViewById(R.id.rvSchedule);
         ivBack = findViewById(R.id.ivBack);
 
-        // Lấy dữ liệu chuyến đi được truyền sang
         TripModel trip = (TripModel) getIntent().getSerializableExtra("trip_data");
 
         if (trip != null) {
@@ -56,7 +61,6 @@ public class TripDetailActivity extends AppCompatActivity {
 
     private void setupRecycler() {
         adapter = new ScheduleAdapter(list,
-                // 1. Xem chi tiết
                 item -> {
                     Intent i = new Intent(this, PlaceDetailActivity.class);
                     i.putExtra("id", item.getPlaceId());
@@ -66,7 +70,6 @@ public class TripDetailActivity extends AppCompatActivity {
                     i.putExtra("address", item.getPlaceAddress());
                     startActivity(i);
                 },
-                // 2. Hành động (Xóa & Sửa)
                 new ScheduleAdapter.OnActionListener() {
                     @Override
                     public void onDelete(ScheduleItemModel item, int position) {
@@ -75,7 +78,7 @@ public class TripDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void onEdit(ScheduleItemModel item, int position) {
-                        showEditDialog(item, position); // MỚI: Gọi hàm sửa
+                        showEditDialog(item, position);
                     }
                 }
         );
@@ -83,97 +86,166 @@ public class TripDetailActivity extends AppCompatActivity {
         rvSchedule.setLayoutManager(new LinearLayoutManager(this));
         rvSchedule.setAdapter(adapter);
     }
+
+    // ============================================================
+    // LOGIC SỬA (EDIT)
+    // ============================================================
     private void showEditDialog(ScheduleItemModel item, int position) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.dialog_add_to_trip, null);
         builder.setView(view);
-        androidx.appcompat.app.AlertDialog dialog = builder.create();
+        AlertDialog dialog = builder.create();
 
-        // Ánh xạ
+        // Ẩn các phần không cần thiết
         TextView tvTitle = view.findViewById(R.id.tvDialogTitle);
         if (tvTitle != null) tvTitle.setText("Sửa thông tin");
 
         TextView tvLabel = view.findViewById(R.id.tvLabelTrip);
         if (tvLabel != null) tvLabel.setVisibility(View.GONE);
 
-        View spinnerContainer = view.findViewById(R.id.spTrip);
-        spinnerContainer.setVisibility(View.GONE); // Ẩn spinner
+        View spinnerContainer = view.findViewById(R.id.layoutTripSpinner);
+        if (spinnerContainer != null) spinnerContainer.setVisibility(View.GONE);
 
         EditText etDate = view.findViewById(R.id.etVisitDate);
-        EditText etTime = view.findViewById(R.id.etVisitTime);
+        EditText etStartTime = view.findViewById(R.id.etStartTime);
+        EditText etEndTime = view.findViewById(R.id.etEndTime);
         EditText etNote = view.findViewById(R.id.etNote);
-        android.widget.Button btnConfirm = view.findViewById(R.id.btnConfirmAdd);
+        Button btnConfirm = view.findViewById(R.id.btnConfirmAdd);
 
-        // 1. Điền dữ liệu cũ vào
+        // 1. Điền dữ liệu cũ
         etDate.setText(item.getVisitDate());
-        etTime.setText(item.getVisitTime());
+        etStartTime.setText(item.getVisitTime());
+        etEndTime.setText(item.getEndTime());
         etNote.setText(item.getNote());
         btnConfirm.setText("Cập nhật");
 
-        // 2. Xử lý chọn NGÀY (DatePicker) -> ĐÂY LÀ PHẦN BẠN BỊ THIẾU
+        // 2. Chọn Ngày/Giờ
         etDate.setOnClickListener(v -> {
-            java.util.Calendar c = java.util.Calendar.getInstance();
-            // Tách ngày cũ ra để hiển thị đúng trên lịch (nếu có)
-            int y = c.get(java.util.Calendar.YEAR);
-            int m = c.get(java.util.Calendar.MONTH);
-            int d = c.get(java.util.Calendar.DAY_OF_MONTH);
-
-            new android.app.DatePickerDialog(this, (view1, year, month, dayOfMonth) -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (view1, year, month, dayOfMonth) -> {
                 String dateStr = dayOfMonth + "/" + (month + 1) + "/" + year;
                 etDate.setText(dateStr);
-            }, y, m, d).show();
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
         });
+        etStartTime.setOnClickListener(v -> showTimePicker(etStartTime));
+        etEndTime.setOnClickListener(v -> showTimePicker(etEndTime));
 
-        // 3. Xử lý chọn GIỜ (TimePicker) -> ĐÂY LÀ PHẦN BẠN BỊ THIẾU
-        etTime.setOnClickListener(v -> {
-            java.util.Calendar c = java.util.Calendar.getInstance();
-            int h = c.get(java.util.Calendar.HOUR_OF_DAY);
-            int mi = c.get(java.util.Calendar.MINUTE);
-
-            new android.app.TimePickerDialog(this, (view1, hourOfDay, minute) -> {
-                String timeStr = String.format("%02d:%02d", hourOfDay, minute);
-                etTime.setText(timeStr);
-            }, h, mi, true).show();
-        });
-
-        // 4. Bấm Lưu
+        // 3. Bấm Lưu -> Gọi hàm checkConflictAndUpdate
         btnConfirm.setOnClickListener(v -> {
             String newDate = etDate.getText().toString();
-            String newTime = etTime.getText().toString();
+            String newStart = etStartTime.getText().toString();
+            String newEnd = etEndTime.getText().toString();
             String newNote = etNote.getText().toString();
 
-            if (newDate.isEmpty()) {
-                Toast.makeText(this, "Ngày không được để trống", Toast.LENGTH_SHORT).show();
+            if (newDate.isEmpty() || newStart.isEmpty() || newEnd.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            updateScheduleItem(item, position, newDate, newTime, newNote, dialog);
+            if (convertTimeToMinutes(newEnd) <= convertTimeToMinutes(newStart)) {
+                Toast.makeText(this, "Giờ kết thúc phải sau giờ bắt đầu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Gọi hàm kiểm tra và cập nhật (tương tự như code bạn muốn)
+            checkConflictAndUpdate(item, position, newDate, newStart, newEnd, newNote, dialog);
         });
 
         dialog.show();
     }
 
-    private void updateScheduleItem(ScheduleItemModel item, int position, String date, String time, String note, AlertDialog dialog) {
-        // Cập nhật Firebase
+    // ⭐ HÀM BẠN MUỐN: Kiểm tra trùng -> Toast tên -> Cập nhật
+    private void checkConflictAndUpdate(ScheduleItemModel currentItem, int position, String newDate, String newStart, String newEnd, String newNote, AlertDialog dialog) {
+        db.collection("schedule")
+                .whereEqualTo("tripId", currentItem.getTripId())
+                .whereEqualTo("visitDate", newDate)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    boolean isConflict = false;
+                    int newS = convertTimeToMinutes(newStart);
+                    int newE = convertTimeToMinutes(newEnd);
+
+                    for (DocumentSnapshot doc : querySnapshot) {
+                        // QUAN TRỌNG: Bỏ qua chính item đang sửa (so sánh ID)
+                        if (doc.getId().equals(currentItem.getItemId())) {
+                            continue;
+                        }
+
+                        String existStart = doc.getString("visitTime");
+                        String existEnd = doc.getString("endTime");
+
+                        if (existStart == null || existEnd == null) continue;
+
+                        int oldS = convertTimeToMinutes(existStart);
+                        int oldE = convertTimeToMinutes(existEnd);
+
+                        // Logic trùng giờ
+                        if (newS < oldE && newE > oldS) {
+                            isConflict = true;
+
+                            // Lấy tên địa điểm bị trùng
+                            // Vì dữ liệu Place nằm trong object 'place', ta phải lấy object ra trước
+                            ScheduleItemModel existItem = doc.toObject(ScheduleItemModel.class);
+                            String conflictName = "Địa điểm khác";
+                            if (existItem != null && existItem.getPlaceName() != null) {
+                                conflictName = existItem.getPlaceName();
+                            }
+
+                            // Hiển thị thông báo
+                            Toast.makeText(this, "Bị trùng giờ với: " + conflictName, Toast.LENGTH_LONG).show();
+                            break; // Dừng vòng lặp
+                        }
+                    }
+
+                    // Nếu không trùng thì mới cho Update
+                    if (!isConflict) {
+                        performUpdate(currentItem, position, newDate, newStart, newEnd, newNote, dialog);
+                    }
+                });
+    }
+
+    // Hàm thực hiện Update xuống Firebase (Tách ra cho gọn)
+    private void performUpdate(ScheduleItemModel item, int position, String date, String start, String end, String note, AlertDialog dialog) {
         db.collection("schedule").document(item.getItemId())
                 .update(
                         "visitDate", date,
-                        "visitTime", time,
+                        "visitTime", start,
+                        "endTime", end,
                         "note", note
                 )
                 .addOnSuccessListener(aVoid -> {
-                    // Cập nhật thành công -> Cập nhật list local và Refresh Adapter
+                    // Cập nhật Local List
                     item.setVisitDate(date);
-                    item.setVisitTime(time);
+                    item.setVisitTime(start);
+                    item.setEndTime(end);
                     item.setNote(note);
 
                     adapter.notifyItemChanged(position);
                     dialog.dismiss();
-                    Toast.makeText(this, "Đã cập nhật", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đã cập nhật thành công", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
-    // ⭐ HÀM MỚI: Load dữ liệu và gán ID
+
+    // ============================================================
+    // CÁC HÀM TIỆN ÍCH
+    // ============================================================
+    private void showTimePicker(EditText et) {
+        Calendar c = Calendar.getInstance();
+        new TimePickerDialog(this, (view, hourOfDay, minute) -> {
+            et.setText(String.format("%02d:%02d", hourOfDay, minute));
+        }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
+    }
+
+    private int convertTimeToMinutes(String timeStr) {
+        try {
+            String[] parts = timeStr.split(":");
+            return Integer.parseInt(parts[0]) * 60 + Integer.parseInt(parts[1]);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     private void loadData(String tripId) {
         db.collection("schedule")
                 .whereEqualTo("tripId", tripId)
@@ -184,16 +256,13 @@ public class TripDetailActivity extends AppCompatActivity {
                     list.clear();
                     for (DocumentSnapshot doc : snap) {
                         ScheduleItemModel item = doc.toObject(ScheduleItemModel.class);
-                        // QUAN TRỌNG: Lưu ID của document để tí nữa còn xóa được
                         item.setItemId(doc.getId());
                         list.add(item);
                     }
                     adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                });
     }
 
-    // ⭐ HÀM MỚI: Hiện hộp thoại xác nhận xóa
     private void showDeleteConfirmDialog(ScheduleItemModel item, int position) {
         new AlertDialog.Builder(this)
                 .setTitle("Xóa địa điểm")
@@ -203,23 +272,14 @@ public class TripDetailActivity extends AppCompatActivity {
                 .show();
     }
 
-    // ⭐ HÀM MỚI: Xóa khỏi Firebase
     private void deleteScheduleItem(ScheduleItemModel item, int position) {
-        if (item.getItemId() == null) {
-            Toast.makeText(this, "Lỗi: Không tìm thấy ID", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        if (item.getItemId() == null) return;
         db.collection("schedule").document(item.getItemId())
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    // Xóa thành công trên Server thì xóa trên giao diện
                     list.remove(position);
                     adapter.notifyItemRemoved(position);
                     Toast.makeText(this, "Đã xóa thành công", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

@@ -10,7 +10,39 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp">
+
+        <LinearLayout
+            android:id="@+id/actionContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/btnAddToTrip"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_calendar"
+                app:tint="#FF9800"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Add to trip"/>
+
+            <ImageView
+                android:id="@+id/btnFavorite"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_heart_outline"
+                app:tint="#F44336"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Favorite"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/infoContainer"
@@ -18,9 +50,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:layout_toStartOf="@id/btnFavorite">
+            android:layout_toStartOf="@id/actionContainer"
+            android:layout_centerVertical="true">
 
-            <!-- Tên -->
             <TextView
                 android:id="@+id/tvPlaceName"
                 android:layout_width="match_parent"
@@ -28,9 +60,10 @@
                 android:text="Place Name"
                 android:textStyle="bold"
                 android:textSize="16sp"
-                android:textColor="#000"/>
+                android:textColor="#000"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
-            <!-- Địa chỉ -->
             <TextView
                 android:id="@+id/tvPlaceAddress"
                 android:layout_width="match_parent"
@@ -40,7 +73,6 @@
                 android:maxLines="2"
                 android:ellipsize="end"/>
 
-            <!-- ⭐ Rating + Đường đi -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,20 +101,7 @@
                     android:textStyle="bold"
                     android:padding="4dp"/>
             </LinearLayout>
-
         </LinearLayout>
 
-        <!-- ❤️ FAVORITE BUTTON -->
-        <ImageView
-            android:id="@+id/btnFavorite"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="8dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_heart_outline"
-            app:tint="#F44336"/>
     </RelativeLayout>
-
 </androidx.cardview.widget.CardView>

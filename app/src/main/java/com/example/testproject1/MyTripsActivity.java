@@ -1,22 +1,30 @@
 package com.example.testproject1;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MyTripsActivity extends AppCompatActivity {
 
@@ -36,8 +44,8 @@ public class MyTripsActivity extends AppCompatActivity {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         } else {
-            // Xử lý nếu chưa login (vd: finish() hoặc yêu cầu login)
             Toast.makeText(this, "Bạn cần đăng nhập", Toast.LENGTH_SHORT).show();
+            // Có thể finish() ở đây nếu muốn bắt buộc login
             return;
         }
 
@@ -48,7 +56,7 @@ public class MyTripsActivity extends AppCompatActivity {
         adapter = new TripAdapter(this, tripList, trip -> {
             // KHI BẤM VÀO 1 CHUYẾN ĐI -> MỞ MÀN HÌNH CHI TIẾT
             Intent intent = new Intent(MyTripsActivity.this, TripDetailActivity.class);
-            intent.putExtra("trip_data", trip); // Truyền dữ liệu chuyến đi sang
+            intent.putExtra("trip_data", trip); // Class TripModel phải implements Serializable
             startActivity(intent);
         });
         rvMyTrips.setLayoutManager(new LinearLayoutManager(this));
@@ -57,43 +65,40 @@ public class MyTripsActivity extends AppCompatActivity {
         // Load dữ liệu
         loadUserTrips();
 
-        // Nút tạo chuyến đi mới
+        // Nút tạo chuyến đi mới (FAB hoặc Button trong layout activity_my_trips)
         findViewById(R.id.btnCreateTrip).setOnClickListener(v -> showCreateTripDialog());
+
         setupBottomNav();
     }
+
     private void setupBottomNav() {
         LinearLayout navHome = findViewById(R.id.navHome);
         LinearLayout navBookmark = findViewById(R.id.navBookmark);
         LinearLayout navCalendar = findViewById(R.id.navCalendar);
         LinearLayout navNotification = findViewById(R.id.navNotification);
 
-        // 1. Nút Home: Quay về HomeActivity
         navHome.setOnClickListener(v -> {
             Intent intent = new Intent(MyTripsActivity.this, HomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
             overridePendingTransition(0, 0);
-            finish(); // Đóng màn hình hiện tại
+            finish();
         });
 
-        // 2. Nút Bookmark: Chuyển sang Wishlist
         navBookmark.setOnClickListener(v -> {
             Intent intent = new Intent(MyTripsActivity.this, WishlistActivity.class);
             startActivity(intent);
             overridePendingTransition(0, 0);
-            finish(); // Đóng màn hình hiện tại để tránh chồng activities
+            finish();
         });
 
-        // 3. Nút Calendar: Đang ở đây rồi nên không làm gì cả (hoặc reload)
-        navCalendar.setOnClickListener(v -> {
-            // Do nothing
-        });
+        navCalendar.setOnClickListener(v -> {});
 
-        // 4. Notification
-        navNotification.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
-        });
+        navNotification.setOnClickListener(v ->
+                Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show()
+        );
     }
+
     private void loadUserTrips() {
         db.collection("trips")
                 .whereEqualTo("userId", currentUserId)
@@ -105,57 +110,107 @@ public class MyTripsActivity extends AppCompatActivity {
                             TripModel trip = document.toObject(TripModel.class);
                             tripList.add(trip);
                         }
+
+                        View emptyState = findViewById(R.id.layoutEmptyState);
                         if (tripList.isEmpty()) {
-                            // Nếu không có chuyến đi: Hiện hình minh họa, Ẩn danh sách
-                            findViewById(R.id.layoutEmptyState).setVisibility(View.VISIBLE);
-                            findViewById(R.id.rvMyTrips).setVisibility(View.GONE);
+                            if (emptyState != null) emptyState.setVisibility(View.VISIBLE);
+                            rvMyTrips.setVisibility(View.GONE);
                         } else {
-                            // Có dữ liệu: Ẩn hình minh họa, Hiện danh sách
-                            findViewById(R.id.layoutEmptyState).setVisibility(View.GONE);
-                            findViewById(R.id.rvMyTrips).setVisibility(View.VISIBLE);
+                            if (emptyState != null) emptyState.setVisibility(View.GONE);
+                            rvMyTrips.setVisibility(View.VISIBLE);
                         }
                         adapter.notifyDataSetChanged();
                     }
                 });
     }
 
+    // ============================================================
+    // ⭐ LOGIC TẠO CHUYẾN ĐI MỚI
+    // ============================================================
     private void showCreateTripDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Tạo chuyến đi mới");
+        // Inflate layout mới bạn đã sửa (dialog_create_trip.xml)
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_create_trip, null);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
 
-        // Layout đơn giản cho dialog (hoặc bạn có thể tạo layout xml riêng)
-        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_create_trip, null, false);
-        // ⚠️ Lưu ý: Bạn cần tạo layout dialog_create_trip.xml (xem bên dưới)
+        // Làm nền dialog trong suốt để bo góc đẹp hơn
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
 
-        final EditText inputName = viewInflated.findViewById(R.id.etTripName);
-        final EditText inputStart = viewInflated.findViewById(R.id.etStartDate);
-        final EditText inputEnd = viewInflated.findViewById(R.id.etEndDate);
+        // Ánh xạ View từ dialog_create_trip.xml
+        EditText etName = view.findViewById(R.id.etTripName);
+        EditText etStart = view.findViewById(R.id.etStartDate);
+        EditText etEnd = view.findViewById(R.id.etEndDate);
+        Button btnCreate = view.findViewById(R.id.btnCreateTrip);
 
-        builder.setView(viewInflated);
-
-        builder.setPositiveButton("Tạo", (dialog, which) -> {
-            String name = inputName.getText().toString();
-            String start = inputStart.getText().toString();
-            String end = inputEnd.getText().toString();
-
-            if (!name.isEmpty()) {
-                createNewTrip(name, start, end);
-            }
+        // 1. Sự kiện chọn Ngày Bắt Đầu
+        etStart.setOnClickListener(v -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (view1, year, month, dayOfMonth) -> {
+                String date = dayOfMonth + "/" + (month + 1) + "/" + year;
+                etStart.setText(date);
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
         });
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
 
-        builder.show();
+        // 2. Sự kiện chọn Ngày Kết Thúc
+        etEnd.setOnClickListener(v -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (view1, year, month, dayOfMonth) -> {
+                String date = dayOfMonth + "/" + (month + 1) + "/" + year;
+                etEnd.setText(date);
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        // 3. Sự kiện nút Tạo
+        btnCreate.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String start = etStart.getText().toString().trim();
+            String end = etEnd.getText().toString().trim();
+
+            // Validate dữ liệu
+            if (name.isEmpty() || start.isEmpty() || end.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Kiểm tra ngày kết thúc >= ngày bắt đầu
+            if (convertDateToMillis(end) < convertDateToMillis(start)) {
+                Toast.makeText(this, "Ngày kết thúc phải sau ngày bắt đầu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            createNewTrip(name, start, end, dialog);
+        });
+
+        dialog.show();
     }
 
-    private void createNewTrip(String name, String start, String end) {
+    private void createNewTrip(String name, String start, String end, AlertDialog dialog) {
         String tripId = db.collection("trips").document().getId();
+
+        // Constructor TripModel(id, name, start, end, userId)
         TripModel newTrip = new TripModel(tripId, name, start, end, currentUserId);
 
         db.collection("trips").document(tripId).set(newTrip)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Đã tạo chuyến đi!", Toast.LENGTH_SHORT).show();
-                    loadUserTrips(); // Refresh list
+                    Toast.makeText(this, "Tạo chuyến đi thành công!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    loadUserTrips();
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+
+    private long convertDateToMillis(String dateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date date = sdf.parse(dateStr);
+            return date != null ? date.getTime() : 0;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }

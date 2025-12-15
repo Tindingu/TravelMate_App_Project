@@ -12,21 +12,20 @@ import java.util.List;
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHolder> {
 
     private List<ScheduleItemModel> list;
-    private OnItemClickListener listener;      // Click item để xem chi tiết
-    private OnActionListener actionListener;   // ⭐ MỚI: Xử lý cả Xóa và Sửa
+    private OnItemClickListener listener;
+    private OnActionListener actionListener;
 
-    // Interface xem chi tiết (giữ nguyên)
+    // Interface xem chi tiết
     public interface OnItemClickListener {
         void onClick(ScheduleItemModel item);
     }
 
-    // ⭐ MỚI: Interface gộp chung cho các hành động (Action)
+    // Interface gộp chung cho các hành động (Xóa, Sửa)
     public interface OnActionListener {
         void onDelete(ScheduleItemModel item, int position);
-        void onEdit(ScheduleItemModel item, int position); // Thêm hàm Edit
+        void onEdit(ScheduleItemModel item, int position);
     }
 
-    // ⭐ Cập nhật Constructor: Nh nhận OnActionListener thay vì OnDeleteClickListener
     public ScheduleAdapter(List<ScheduleItemModel> list, OnItemClickListener listener, OnActionListener actionListener) {
         this.list = list;
         this.listener = listener;
@@ -44,7 +43,18 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ScheduleItemModel item = list.get(position);
 
-        holder.tvTime.setText(item.getVisitTime());
+        // ⭐ SỬA ĐOẠN NÀY: Hiển thị cả Giờ Bắt Đầu và Kết Thúc
+        String timeDisplay = item.getVisitTime(); // Giờ bắt đầu
+
+        // Nếu có giờ kết thúc thì nối thêm vào
+        if (item.getEndTime() != null && !item.getEndTime().isEmpty()) {
+            // Dùng \n để xuống dòng cho đẹp trong cột hẹp
+            timeDisplay = timeDisplay + " - " + item.getEndTime();
+        }
+
+        holder.tvTime.setText(timeDisplay);
+        // ----------------------------------------------------
+
         holder.tvDate.setText(item.getVisitDate());
         holder.tvName.setText(item.getPlaceName());
         holder.tvAddress.setText(item.getPlaceAddress());
@@ -56,17 +66,17 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
             holder.tvNote.setVisibility(View.GONE);
         }
 
-        // 1. Click vào cả dòng -> Xem chi tiết
+        // 1. Click item -> Xem chi tiết
         holder.itemView.setOnClickListener(v -> listener.onClick(item));
 
-        // 2. Click nút Xóa -> Gọi hàm onDelete
+        // 2. Click Xóa
         holder.btnDelete.setOnClickListener(v -> {
             if (actionListener != null) {
                 actionListener.onDelete(item, position);
             }
         });
 
-        // 3. ⭐ MỚI: Click nút Sửa -> Gọi hàm onEdit
+        // 3. Click Sửa
         holder.btnEdit.setOnClickListener(v -> {
             if (actionListener != null) {
                 actionListener.onEdit(item, position);
@@ -80,7 +90,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvTime, tvDate, tvName, tvNote, tvAddress;
         ImageView btnDelete;
-        ImageView btnEdit; // ⭐ MỚI: Khai báo nút sửa
+        ImageView btnEdit;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,8 +100,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
             tvNote = itemView.findViewById(R.id.tvNote);
             tvAddress = itemView.findViewById(R.id.tvAddress);
             btnDelete = itemView.findViewById(R.id.btnDelete);
-
-            // ⭐ MỚI: Ánh xạ nút sửa (đảm bảo trong item_schedule.xml đã có id btnEdit)
             btnEdit = itemView.findViewById(R.id.btnEdit);
         }
     }
