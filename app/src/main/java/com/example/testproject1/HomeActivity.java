@@ -95,7 +95,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     // GPS
     FusedLocationProviderClient fusedLocationClient;
 
-    private static final String API_KEY_GEMINI = "AIzaSyBwpJsZDlM5UezcHuOIpCEXNf-UheGAENE";
+    private static final String API_KEY_GEMINI = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
