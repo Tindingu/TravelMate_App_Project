@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,6 +26,12 @@
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:theme="@style/Theme.UCrop.Fixed"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
 
         <activity
             android:name=".WelcomeActivity"
@@ -35,9 +45,25 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".ProfileUpdateActivity" />
+        <activity android:name=".ChangeAvatar" />
+        <activity android:name=".ChangeUsernameActivity" />
+        <activity android:name=".ChangePasswordActivity" />
         <activity android:name=".ForgotPasswordActivity" />
         <activity android:name=".WishlistActivity" />
         <activity android:name=".PlaceDetailActivity" />
+        <activity android:name=".ProfilePublicActivity" />
+
+
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -66,6 +92,7 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
 
     </application>
 

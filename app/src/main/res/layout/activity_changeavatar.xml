@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/white">
+
+    <!-- Top app bar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_change_avatar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        app:title="Thay đổi ảnh đại diện"
+        app:titleTextColor="@color/black"
+        app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    <!-- Avatar preview -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp">
+
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:src="@drawable/sample_avatar"
+            android:scaleType="centerCrop"
+            android:contentDescription="Ảnh đại diện"
+            android:background="@drawable/avatar_circle_bg" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nhấn vào 'Chọn ảnh' để lấy ảnh từ máy"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp" />
+    </LinearLayout>
+
+    <!-- Choose image button -->
+    <Button
+        android:id="@+id/btnChooseImage"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="Chọn ảnh"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:background="@drawable/button_white_border_purple"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Save / Cancel buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/btnCancelAvatar"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Hủy"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:background="@drawable/button_white_border_purple" />
+
+        <Button
+            android:id="@+id/btnSaveAvatar"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Lưu"
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:background="@drawable/button_rounded_purple" />
+
+    </LinearLayout>
+
+</LinearLayout>

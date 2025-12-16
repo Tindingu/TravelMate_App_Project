@@ -1,3 +1,4 @@
+
 package com.example.testproject1;
 
 import android.Manifest;
@@ -17,10 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-//import com.android.volley.Response;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -44,7 +42,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,48 +60,59 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    // =========================
     // UI
-    LinearLayout navHome, navBookmark, navCalendar, navNotification;
-    TextView tvHello;
-    ImageView ivProfile, ivSearchBtn;
-    EditText etSearch;
+    // =========================
+    private LinearLayout navHome, navBookmark, navCalendar, navNotification;
+    private TextView tvHello;
+    private ImageView ivProfile, ivSearchBtn;
+    private EditText etSearch;
 
     // RecyclerView
-    RecyclerView rvPlaces;
-    PlaceAdapter placeAdapter;
-    ArrayList<PlaceModel> placeList;
-    Set<String> wishlistIds = new HashSet<>();
+    private RecyclerView rvPlaces;
+    private PlaceAdapter placeAdapter;
+    private ArrayList<PlaceModel> placeList;
+    private final Set<String> wishlistIds = new HashSet<>();
 
-    // Firebase + Map
-    FirebaseAuth auth;
-    FirebaseUser user;
-    FirebaseFirestore db;
-    GoogleMap mMap;
-    RequestQueue queue;
-    GeminiService gpt;
+    // Firebase + Map + Network
+    private FirebaseAuth auth;
+    private FirebaseUser user;
+    private FirebaseFirestore db;
+    private GoogleMap mMap;
+    private RequestQueue queue;
+    private GeminiService gpt;
 
     // GPS
-    FusedLocationProviderClient fusedLocationClient;
-    LinearLayout filterPanel;
-    View dimBackground;
-    ImageView ivMenu;
-    boolean isFilterOpen = false;
-    // Filter UI
-    CheckBox cbRestaurant, cbCafe, cbHotel, cbEntertainment, cbBar;
-    SeekBar seekDistance, seekRating,seekSoLuong;
-    TextView tvDistanceValue, tvRatingValue,tvSoLuong;
-    Button btnApplyFilter, btnResetFilter;
-    Set<String> selectedTypes = new HashSet<>();
-    int selectedDistance = 1000; // mét
-    int selectedRating = 3;
-    int selectedSoLuong=15;
-    LinearLayout layoutResultInfo;
-    TextView tvResultInfo;
-    private static final String API_KEY_GEMINI = "";
+    private FusedLocationProviderClient fusedLocationClient;
+
+    // Filter Panel
+    private LinearLayout filterPanel;
+    private View dimBackground;
+    private ImageView ivMenu;
+    private boolean isFilterOpen = false;
+
+    private CheckBox cbRestaurant, cbCafe, cbHotel, cbEntertainment, cbBar;
+    private SeekBar seekDistance, seekRating, seekSoLuong;
+    private TextView tvDistanceValue, tvRatingValue, tvSoLuong;
+    private Button btnApplyFilter, btnResetFilter;
+
+    private final Set<String> selectedTypes = new HashSet<>();
+    private int selectedDistance = 1000; // meters
+    private int selectedRating = 3;
+    private int selectedSoLuong = 15;
+
+    private LinearLayout layoutResultInfo;
+    private TextView tvResultInfo;
+
+    // TODO: set API key
+    private static final String API_KEY_GEMINI = "AIzaSyBVp_j43nfQEHK2RPaVsnIT2ogIENGnhOQ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +122,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = auth.getCurrentUser();
+
         queue = Volley.newRequestQueue(this);
         gpt = new GeminiService(API_KEY_GEMINI);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -122,8 +131,10 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         setupUserProfile();
         setupRecyclerView();
         setupBottomNav();
+        setupFilterLogic();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.homeMap);
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.homeMap);
         if (mapFragment != null) mapFragment.getMapAsync(this);
 
         listenToWishlist();
@@ -135,10 +146,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 runAI(query);
             }
         });
+
         ivMenu.setOnClickListener(v -> toggleFilter());
         dimBackground.setOnClickListener(v -> toggleFilter());
-        setupFilterLogic();
-
     }
 
     @Override
@@ -160,6 +170,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         etSearch = findViewById(R.id.etSearch);
 
         rvPlaces = findViewById(R.id.rvPlaces);
+
         filterPanel = findViewById(R.id.filterPanel);
         dimBackground = findViewById(R.id.dimBackground);
         ivMenu = findViewById(R.id.ivFilter);
@@ -173,8 +184,8 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         seekDistance = findViewById(R.id.seekDistance);
         tvDistanceValue = findViewById(R.id.tvDistanceValue);
 
-        seekSoLuong=findViewById(R.id.seekSoLuong);
-        tvSoLuong=findViewById(R.id.tvSoLuong);
+        seekSoLuong = findViewById(R.id.seekSoLuong);
+        tvSoLuong = findViewById(R.id.tvSoLuong);
 
         seekRating = findViewById(R.id.seekRating);
         tvRatingValue = findViewById(R.id.tvRatingValue);
@@ -184,8 +195,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         layoutResultInfo = findViewById(R.id.layoutResultInfo);
         tvResultInfo = findViewById(R.id.tvResultInfo);
-
-
     }
 
     // ============================================================
@@ -194,9 +203,11 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void listenToWishlist() {
         if (user == null) return;
 
-        db.collection("users").document(user.getUid()).collection("wishlist")
+        db.collection("users")
+                .document(user.getUid())
+                .collection("wishlist")
                 .addSnapshotListener((value, error) -> {
-                    if (error != null) return;
+                    if (error != null || value == null) return;
 
                     wishlistIds.clear();
                     for (DocumentSnapshot doc : value.getDocuments()) {
@@ -208,7 +219,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                             String docId = p.getName().replaceAll("[^a-zA-Z0-9]", "_");
                             p.setFavorite(wishlistIds.contains(docId));
                         }
-                        placeAdapter.notifyDataSetChanged();
+                        if (placeAdapter != null) placeAdapter.notifyDataSetChanged();
                     }
                 });
     }
@@ -217,25 +228,21 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     // ⭐ SETUP LIST
     // ============================================================
     private void setupRecyclerView() {
-
         placeList = new ArrayList<>();
-        rvPlaces.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Hiệu ứng Snap căn giữa
+        rvPlaces.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        );
         new PagerSnapHelper().attachToRecyclerView(rvPlaces);
 
-        // TẠO ADAPTER ĐẦY ĐỦ 3 CALLBACK
         placeAdapter = new PlaceAdapter(
                 placeList,
 
-                // ============================
-                // 1. CLICK ITEM → ZOOM MAP + DETAIL
-                // ============================
+                // 1) CLICK ITEM → ZOOM MAP + DETAIL
                 place -> {
                     if (mMap != null) {
                         LatLng loc = new LatLng(place.getLat(), place.getLon());
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 17f));
-
                         Marker m = mMap.addMarker(new MarkerOptions().position(loc).title(place.getName()));
                         if (m != null) m.showInfoWindow();
                     }
@@ -250,29 +257,26 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                     startActivity(intent);
                 },
 
-                // ============================
-                // 2. CLICK TIM → WISHLIST
-                // ============================
+                // 2) CLICK TIM → WISHLIST
                 place -> {
                     if (place.isFavorite()) addToWishlist(place);
                     else removeFromWishlist(place);
                 },
 
-                // ============================
-                // 3. CLICK "Đường đi >"
-                // ============================
+                // 3) CLICK "Đường đi >"
                 place -> {
-                    // Lấy vị trí hiện tại
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                                this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                101
+                        );
                         return;
                     }
+
                     fusedLocationClient.getLastLocation()
                             .addOnSuccessListener(location -> {
                                 if (location == null) {
@@ -298,21 +302,19 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void requestRoute(double startLat, double startLon, double endLat, double endLon) {
+        if (mMap == null) return;
 
         String coords = startLon + "," + startLat + ";" + endLon + "," + endLat;
 
         OSRMApi api = RetrofitClient.getApi();
-
-        Call<OSRMResponse> call = api.getRoute(
-                coords,
-                "full",
-                "polyline"
-        );
+        Call<OSRMResponse> call = api.getRoute(coords, "full", "polyline");
 
         call.enqueue(new Callback<OSRMResponse>() {
             @Override
-            public void onResponse(Call<OSRMResponse> call, Response<OSRMResponse> response) {
-                if (!response.isSuccessful() || response.body() == null) {
+            public void onResponse(@NonNull Call<OSRMResponse> call, @NonNull Response<OSRMResponse> response) {
+                if (!response.isSuccessful() || response.body() == null
+                        || response.body().getRoutes() == null
+                        || response.body().getRoutes().isEmpty()) {
                     Log.e("OSRM", "Dữ liệu OSRM không hợp lệ");
                     return;
                 }
@@ -331,18 +333,16 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (Exception e) {
                     Log.e("OSRM_ERR", e.toString());
                 }
-                Log.d("OSRM_RAW", new Gson().toJson(response.body()));
 
+                Log.d("OSRM_RAW", new Gson().toJson(response.body()));
             }
 
             @Override
-            public void onFailure(Call<OSRMResponse> call, Throwable t) {
-                Log.e("OSRM_FAIL", t.getMessage());
+            public void onFailure(@NonNull Call<OSRMResponse> call, @NonNull Throwable t) {
+                Log.e("OSRM_FAIL", String.valueOf(t.getMessage()));
             }
         });
     }
-
-
 
     // ============================================================
     // ⭐ AI → NOMINATIM → OSM SEARCH
@@ -357,7 +357,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                         String location = json.getString("location");
                         int radius = json.getInt("radius");
                         getLocationFromAI(location, category, radius);
-                    } catch (Exception e) { Log.e("AI_PARSE", e.getMessage()); }
+                    } catch (Exception e) {
+                        Log.e("AI_PARSE", String.valueOf(e.getMessage()));
+                    }
                 });
             }
 
@@ -371,21 +373,29 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void getLocationFromAI(String locationName, String category, int radius) {
-        String url = "https://nominatim.openstreetmap.org/search?format=json&q=" + locationName.replace(" ", "+");
+        String url = "https://nominatim.openstreetmap.org/search?format=json&q="
+                + locationName.replace(" ", "+");
 
-        JsonArrayRequest req = new JsonArrayRequest(Request.Method.GET, url, null,
+        JsonArrayRequest req = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
                 response -> {
                     try {
                         if (response.length() == 0) {
                             Toast.makeText(this, "Không tìm thấy vùng: " + locationName, Toast.LENGTH_SHORT).show();
                             return;
                         }
+
                         double lat = response.getJSONObject(0).getDouble("lat");
                         double lon = response.getJSONObject(0).getDouble("lon");
 
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 14f));
+                        if (mMap != null) mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 14f));
                         searchOSM_AI(category, lat, lon, radius);
-                    } catch (Exception e) { Log.e("NOMI_ERR", e.getMessage()); }
+
+                    } catch (Exception e) {
+                        Log.e("NOMI_ERR", String.valueOf(e.getMessage()));
+                    }
                 },
                 error -> Toast.makeText(this, "Lỗi map (403 hoặc quá tải)", Toast.LENGTH_SHORT).show()
         ) {
@@ -399,28 +409,16 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         queue.add(req);
     }
-//    private String[] mapCategoryToOSM(String category) {
-//        switch (category.toLowerCase()) {
-//            case "hotel":
-//                return new String[]{"tourism", "hotel"};
-//            case "restaurant":
-//                return new String[]{"amenity", "restaurant"};
-//            case "cafe":
-//                return new String[]{"amenity", "cafe"};
-//            case "bar":
-//                return new String[]{"amenity", "bar"};
-//            case "fast_food":
-//                return new String[]{"amenity", "fast_food"};
-//        }
-//        return new String[]{"amenity", category}; // fallback
-//    }
-    private List<String[]> mapCategoryToOSM(String category) {
-        List<String[]> tags = new ArrayList<>();
-        String c = category.toLowerCase();
-        selectedTypes.add(c);
-        for(String a:selectedTypes) {
-            switch (a) {
 
+    private List<String[]> mapCategoryToOSM(String category) {
+        // NOTE: giữ behavior của bạn: category sẽ được đưa vào selectedTypes
+        List<String[]> tags = new ArrayList<>();
+        String c = category == null ? "" : category.toLowerCase();
+
+        selectedTypes.add(c);
+
+        for (String a : selectedTypes) {
+            switch (a) {
                 case "hotel":
                 case "resort":
                 case "homestay":
@@ -459,8 +457,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                     break;
 
                 default:
-                    // fallback: tìm theo amenity
-                    tags.add(new String[]{"amenity", c});
+                    if (!a.isEmpty()) tags.add(new String[]{"amenity", a});
                     break;
             }
         }
@@ -468,7 +465,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private String buildOverpassQuery(List<String[]> tags, double lat, double lon, int radius) {
-
         StringBuilder sb = new StringBuilder();
         sb.append("https://overpass-api.de/api/interpreter?data=[out:json];(");
 
@@ -482,12 +478,11 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         sb.append(");out 50;");
-
         return sb.toString();
     }
 
-
     private void searchOSM_AI(String category, double lat, double lon, int radius) {
+        if (mMap == null) return;
 
         List<String[]> tagss = mapCategoryToOSM(category);
         String url = buildOverpassQuery(tagss, lat, lon, radius);
@@ -534,50 +529,50 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 if (addrs != null && !addrs.isEmpty()) {
                                     address = addrs.get(0).getAddressLine(0);
                                 }
-                            } catch (IOException ignored) {}
+                            } catch (Exception ignored) {}
 
-                            // ✅ TẠO PLACE TRƯỚC
+                            // 1) Tạo place trước
                             PlaceModel place = new PlaceModel(name, address, 0.0, la, lo);
 
-                            String docId = name.replaceAll("[^a-zA-Z0-9]", "_");
-                            place.setFavorite(wishlistIds.contains(docId));
+                            String favId = name.replaceAll("[^a-zA-Z0-9]", "_");
+                            place.setFavorite(wishlistIds.contains(favId));
 
-                            int position = placeList.size(); // 🔥 VỊ TRÍ ITEM
                             placeList.add(place);
 
                             mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(la, lo))
                                     .title(name));
 
-                            // ✅ LẤY RATING SAU
+                            // 2) Load rating sau (async) + update đúng item
                             String placesID = la + "_" + lo;
-                            final int index = position;
-
+                            ensurePlaceExists(placesID, name, address, la, lo);
                             if (user != null) {
                                 db.collection("places")
                                         .document(placesID)
                                         .get()
                                         .addOnSuccessListener(doc -> {
+                                            double rating = 0.0;
                                             if (doc.exists() && doc.getDouble("ratingAvg") != null) {
-                                                place.setRating(doc.getDouble("ratingAvg"));
+                                                rating = doc.getDouble("ratingAvg");
+                                            }
 
-                                                int realIndex = placeList.indexOf(place);
-                                                if (realIndex != -1) {
-                                                    placeAdapter.notifyItemChanged(realIndex);
-                                                }
+                                            place.setRating(rating);
+
+                                            int realIndex = placeList.indexOf(place);
+                                            if (realIndex != -1 && placeAdapter != null) {
+                                                placeAdapter.notifyItemChanged(realIndex);
                                             }
                                         });
-
                             }
                         }
 
                         rvPlaces.setVisibility(View.VISIBLE);
-                        placeAdapter.notifyDataSetChanged();
+                        if (placeAdapter != null) placeAdapter.notifyDataSetChanged();
 
                         showResultInfoAutoHide(placeList.size(), selectedSoLuong);
 
                     } catch (Exception e) {
-                        Log.e("OSM_ERR", e.getMessage());
+                        Log.e("OSM_ERR", String.valueOf(e.getMessage()));
                     }
                 },
                 error -> Toast.makeText(this, "Lỗi tìm kiếm", Toast.LENGTH_SHORT).show()
@@ -586,101 +581,12 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         queue.add(req);
     }
 
-//    private void searchOSM_AI(String category, double lat, double lon, int radius) {
-////        String[] loc= mapCategoryToOSM(category);
-////
-////        String url = "https://overpass-api.de/api/interpreter?data=[out:json];"
-////                + "node[\"" + loc[0] + "\"=\"" + loc[1] + "\"](around:"
-////                + radius + "," + lat + "," + lon + ");out 50;";
-//        List<String[]> tagss = mapCategoryToOSM(category);
-//
-//        // 2️⃣ build query từ nhiều tag
-//        String url = buildOverpassQuery(tagss, lat, lon, radius);
-//
-//        Log.d("OVERPASS_URL", url);
-//
-//        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null,
-//                res -> {
-//                    try {
-//                        mMap.clear();
-//                        placeList.clear();
-//
-//                        JSONArray arr = res.getJSONArray("elements");
-//                        int limit = Math.min(arr.length(), selectedSoLuong);
-//
-//                        if (limit == 0) {
-//                            Toast.makeText(this, "Không tìm thấy địa điểm nào.", Toast.LENGTH_SHORT).show();
-//                            rvPlaces.setVisibility(View.GONE);
-//                            return;
-//                        }
-//
-//                        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-//
-//                        for (int i = 0; i < limit; i++) {
-//                            JSONObject o = arr.getJSONObject(i);
-//                            if (!o.has("lat")) continue;
-//
-//                            double la = o.getDouble("lat");
-//                            double lo = o.getDouble("lon");
-//
-//                            String name = "Địa điểm";
-//                            if (o.has("tags")) {
-//                                JSONObject tags = o.getJSONObject("tags");
-//                                if (tags.has("name")) name = tags.getString("name");
-//                                else if (tags.has("brand")) name = tags.getString("brand");
-//                            }
-//
-//                            String address = "Đang cập nhật...";
-//                            try {
-//                                List<Address> addrs = geocoder.getFromLocation(la, lo, 1);
-//                                if (addrs != null && !addrs.isEmpty()) {
-//                                    address = addrs.get(0).getAddressLine(0);
-//                                }
-//                            } catch (IOException ignored) {}
-//                            PlaceModel place = new PlaceModel(name, address, 0.0, la, lo);
-//
-//                            String placesID=la+"_"+lo;
-//                            if (user != null) {
-//                                db.collection("places").document(placesID).get().addOnSuccessListener(doc -> {
-//                                    double c=0.0;
-//                                    if (doc.exists()) {
-//                                         c = doc.getDouble("ratingAvg") != null
-//                                                ? doc.getDouble("ratingAvg")
-//                                                : 0.0;
-//                                         place.setRating(c);
-//                                    }
-//                                });
-//                            }
-//
-////                            PlaceModel place = new PlaceModel(name, address, , la, lo);
-//
-//                            String docId = name.replaceAll("[^a-zA-Z0-9]", "_");
-//                            place.setFavorite(wishlistIds.contains(docId));
-//
-//                            placeList.add(place);
-//                            mMap.addMarker(new MarkerOptions().position(new LatLng(la, lo)).title(name));
-//                        }
-//                        int foundCount = placeList.size();
-//                        int expectedCount = selectedSoLuong; // số lượng user chọn
-//
-//                        showResultInfoAutoHide(foundCount, expectedCount);
-//
-//                        rvPlaces.setVisibility(View.VISIBLE);
-//                        placeAdapter.notifyDataSetChanged();
-//
-//                    } catch (Exception e) { Log.e("OSM_ERR", e.getMessage()); }
-//                },
-//                error -> Toast.makeText(this, "Lỗi tìm kiếm", Toast.LENGTH_SHORT).show()
-//        );
-//        Log.d("SOLUONG", "Hien thi duoc "+selectedSoLuong+" dia diem");
-//        queue.add(req);
-//    }
-
     // ============================================================
     // ⭐ WISHLIST
     // ============================================================
     private void addToWishlist(PlaceModel place) {
         if (user == null) return;
+
         String docId = place.getName().replaceAll("[^a-zA-Z0-9]", "_");
 
         Map<String, Object> data = new HashMap<>();
@@ -691,32 +597,48 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         data.put("lon", place.getLon());
         data.put("timestamp", System.currentTimeMillis());
 
-        db.collection("users").document(user.getUid())
-                .collection("wishlist").document(docId)
+        db.collection("users")
+                .document(user.getUid())
+                .collection("wishlist")
+                .document(docId)
                 .set(data);
     }
 
     private void removeFromWishlist(PlaceModel place) {
         if (user == null) return;
+
         String docId = place.getName().replaceAll("[^a-zA-Z0-9]", "_");
 
-        db.collection("users").document(user.getUid())
-                .collection("wishlist").document(docId)
+        db.collection("users")
+                .document(user.getUid())
+                .collection("wishlist")
+                .document(docId)
                 .delete();
     }
 
     // ============================================================
-    // ⭐ USER INFO
+    // ⭐ USER INFO (Home chỉ hiển thị hello + avatar)
     // ============================================================
     private void setupUserProfile() {
         if (user != null) {
-            db.collection("users").document(user.getUid()).get().addOnSuccessListener(s -> {
-                if (s.exists()) {
-                    tvHello.setText("Hello " + s.getString("name") + "!");
-                    String url = s.getString("profileImageUrl");
-                    if (url != null) Glide.with(this).load(url).placeholder(R.drawable.avttest).into(ivProfile);
-                } else tvHello.setText("Hello " + user.getDisplayName());
-            });
+            db.collection("users")
+                    .document(user.getUid())
+                    .addSnapshotListener((snapshot, e) -> {
+                        if (e != null || snapshot == null || !snapshot.exists()) return;
+
+                        String name = snapshot.getString("name");
+                        String avatarUrl = snapshot.getString("photoUrl");
+
+                        tvHello.setText("Hello " + name + "!");
+
+                        if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                            Glide.with(this)
+                                    .load(avatarUrl)
+                                    .placeholder(R.drawable.avttest)
+                                    .circleCrop()
+                                    .into(ivProfile);
+                        }
+                    });
         }
 
         ivProfile.setOnClickListener(v ->
@@ -728,59 +650,48 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     // ⭐ GOOGLE MAP READY → AUTO ZOOM GPS
     // ============================================================
     @Override
-    public void onMapReady(GoogleMap gm) {
+    public void onMapReady(@NonNull GoogleMap gm) {
         mMap = gm;
         mMap.getUiSettings().setZoomControlsEnabled(true);
+
         getCurrentLocation();
-//        Test
+
+        // (optional) test: click map to draw route from fixed point
+        // Bạn có thể comment nếu không cần
         mMap.setOnMapClickListener(point -> {
             double startLat = 10.8450;
             double startLon = 106.7963;
-
-            double endLat = point.latitude;
-            double endLon = point.longitude;
-
-            Log.d("TEST_OSRM", "Start: " + startLat + "," + startLon);
-            Log.d("TEST_OSRM", "End: " + endLat + "," + endLon);
-
-            requestRoute(startLat, startLon, endLat, endLon);
+            requestRoute(startLat, startLon, point.latitude, point.longitude);
         });
-
     }
 
-    // ============================================================
-    // ⭐ LẤY GPS HIỆN TẠI
-    // ============================================================
     private void getCurrentLocation() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    101
+            );
             return;
         }
 
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null && mMap != null) {
-
                         LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 16f));
-
-                        mMap.addMarker(new MarkerOptions()
-                                .position(pos)
-                                .title("Bạn đang ở đây ⭐"));
+                        mMap.addMarker(new MarkerOptions().position(pos).title("Bạn đang ở đây ⭐"));
                     }
                 });
     }
 
     @Override
-    public void onRequestPermissionsResult(int code, String[] perms, int[] results) {
+    public void onRequestPermissionsResult(int code, @NonNull String[] perms, @NonNull int[] results) {
         super.onRequestPermissionsResult(code, perms, results);
 
-        if (code == 101 && results.length > 0
-                && results[0] == PackageManager.PERMISSION_GRANTED) {
+        if (code == 101 && results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
             getCurrentLocation();
         }
     }
@@ -805,6 +716,8 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(new Intent(this, WishlistActivity.class));
             overridePendingTransition(0, 0);
         }
+
+        // Nếu bạn có Calendar/Notification activity thì thêm tương tự ở đây.
     }
 
     private void resetNav() {
@@ -817,40 +730,28 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setActive(LinearLayout l) {
         l.setBackgroundResource(R.drawable.nav_item_selected_bg);
     }
+
+    // ============================================================
+    // ⭐ FILTER UI
+    // ============================================================
     private void toggleFilter() {
-        View filterPanel = findViewById(R.id.filterPanel);
-        View dimBackground = findViewById(R.id.dimBackground);
-
         if (!isFilterOpen) {
-            // MỞ PANEL
-            filterPanel.animate()
-                    .translationX(0)
-                    .setDuration(250)
-                    .start();
-
+            filterPanel.animate().translationX(0).setDuration(250).start();
             dimBackground.setVisibility(View.VISIBLE);
             dimBackground.animate().alpha(1f).setDuration(250);
-
             isFilterOpen = true;
-
         } else {
-            // ĐÓNG PANEL
-            filterPanel.animate()
-                    .translationX(-filterPanel.getWidth())
-                    .setDuration(250)
-                    .start();
-
+            filterPanel.animate().translationX(-filterPanel.getWidth()).setDuration(250).start();
             dimBackground.animate()
                     .alpha(0f)
                     .setDuration(250)
                     .withEndAction(() -> dimBackground.setVisibility(View.GONE));
-
             isFilterOpen = false;
         }
     }
-    private void updateSelectedTypes() {
-        selectedTypes.clear();
 
+    private void updateSelectedTypesFromCheckbox() {
+        selectedTypes.clear();
         if (cbRestaurant.isChecked()) selectedTypes.add("restaurant");
         if (cbCafe.isChecked()) selectedTypes.add("cafe");
         if (cbHotel.isChecked()) selectedTypes.add("hotel");
@@ -859,9 +760,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void setupFilterLogic() {
-
-        // --- CHECKBOX ---
-        View.OnClickListener typeListener = v -> updateSelectedTypes();
+        View.OnClickListener typeListener = v -> updateSelectedTypesFromCheckbox();
 
         cbRestaurant.setOnClickListener(typeListener);
         cbCafe.setOnClickListener(typeListener);
@@ -869,19 +768,18 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         cbEntertainment.setOnClickListener(typeListener);
         cbBar.setOnClickListener(typeListener);
 
-        // --- DISTANCE SEEKBAR ---
-            seekDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    selectedDistance = (progress/100)*100;
-                    tvDistanceValue.setText(String.format("%.1f km", selectedDistance / 1000.0));
-                }
+        seekDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // giữ cách tính của bạn nhưng tránh = 0 quá dễ
+                selectedDistance = Math.max(100, (progress / 100) * 100);
+                tvDistanceValue.setText(String.format(Locale.getDefault(), "%.1f km", selectedDistance / 1000.0));
+            }
 
-                @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-                @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-            });
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
-        // --- RATING SEEKBAR ---
         seekRating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -892,37 +790,38 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-        // --- SO LUONG KET QUA ---
+
         seekSoLuong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                selectedSoLuong = progress;
-                tvSoLuong.setText(progress + " địa điểm");
+                selectedSoLuong = Math.max(1, progress);
+                tvSoLuong.setText(selectedSoLuong + " địa điểm");
             }
 
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        // --- APPLY FILTER ---
         btnApplyFilter.setOnClickListener(v -> {
             applyFilters();
-            toggleFilter(); // đóng panel
+            toggleFilter();
         });
 
-        // --- RESET FILTER ---
         btnResetFilter.setOnClickListener(v -> resetFilters());
     }
 
     private void applyFilters() {
-
         Log.d("FILTER", "Types = " + selectedTypes);
         Log.d("FILTER", "Distance = " + selectedDistance + "m");
         Log.d("FILTER", "Rating >= " + selectedRating);
 
-        // TODO: Lọc danh sách hoặc gọi API tùy bạn
         Toast.makeText(this, "Đã áp dụng bộ lọc!", Toast.LENGTH_SHORT).show();
+
+        // NOTE: hiện tại filter chỉ log. Nếu muốn lọc thật:
+        // - gọi lại searchOSM_AI với radius = selectedDistance
+        // - hoặc lọc placeList theo rating >= selectedRating
     }
+
     private void resetFilters() {
         cbRestaurant.setChecked(false);
         cbCafe.setChecked(false);
@@ -933,13 +832,17 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         selectedTypes.clear();
 
         seekDistance.setProgress(1000);
-        tvDistanceValue.setText("1 km");
+        tvDistanceValue.setText("1.0 km");
+        selectedDistance = 1000;
 
         seekRating.setProgress(3);
         tvRatingValue.setText("3 sao");
-
-        selectedDistance = 1000;
         selectedRating = 3;
+
+        // nếu bạn muốn reset cả số lượng:
+        // seekSoLuong.setProgress(15);
+        // selectedSoLuong = 15;
+        // tvSoLuong.setText("15 địa điểm");
     }
 
     private void showResultInfoAutoHide(int found, int expected) {
@@ -948,29 +851,48 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         tvResultInfo.setText("Đã tìm thấy " + found + "/" + expected + " địa điểm");
 
-        // Màu theo kết quả
         if (found < expected) {
             layoutResultInfo.setBackgroundResource(R.drawable.bg_result_info_warning);
         } else {
             layoutResultInfo.setBackgroundResource(R.drawable.bg_result_info);
         }
 
-        // Fade in
-        layoutResultInfo.animate()
-                .alpha(1f)
-                .setDuration(300)
-                .start();
+        layoutResultInfo.animate().alpha(1f).setDuration(300).start();
 
-        // Auto hide sau 3 giây
         layoutResultInfo.postDelayed(() -> {
             layoutResultInfo.animate()
                     .alpha(0f)
                     .setDuration(300)
-                    .withEndAction(() ->
-                            layoutResultInfo.setVisibility(View.GONE))
+                    .withEndAction(() -> layoutResultInfo.setVisibility(View.GONE))
                     .start();
         }, 5000);
     }
+    private void ensurePlaceExists(String placeId,
+                                   String name,
+                                   String address,
+                                   double lat,
+                                   double lon) {
 
+        db.collection("places")
+                .document(placeId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("id", placeId);
+                        data.put("name", name);
+                        data.put("address", address);
+                        data.put("lat", lat);
+                        data.put("lon", lon);
+                        data.put("ratingAvg", 0.0);
+                        data.put("createdAt",
+                                com.google.firebase.firestore.FieldValue.serverTimestamp());
+
+                        db.collection("places")
+                                .document(placeId)
+                                .set(data);
+                    }
+                });
+    }
 
 }

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".EmailVerifyActivity">
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/ivBackEmailVerify"
@@ -15,7 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="24dp"
         android:src="@drawable/ic_chevron_up"
-        android:contentDescription="Back button"
+        android:contentDescription="@string/back_button_description"
         app:tint="@color/gray_text" />
 
     <LinearLayout
@@ -29,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TRAVELMATE"
+            android:text="@string/app_name"
             android:textColor="@color/explora_orange"
             android:textSize="34sp"
             android:textStyle="bold" />
@@ -38,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="48dp"
-            android:text="- IF NOT NOW, WHEN? -"
+            android:text="@string/tagline"
             android:textColor="@color/explora_orange"
             android:textSize="14sp" />
 
@@ -46,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="Verify Your Email"
+            android:text="@string/email_verify_title"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -55,32 +53,47 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            android:text="Enter the verification code sent to your email"
+            android:text="@string/email_verify_subtitle"
             android:textColor="@color/gray_text"
             android:textSize="14sp" />
 
-        <EditText
-            android:id="@+id/etVerificationCode"
+        <!-- Màn hình chờ xác thực: ProgressBar + thông báo -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/edittext_rounded_border"
-            android:hint="Verification Code"
-            android:inputType="number"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:textAlignment="center"
-            android:textSize="18sp" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
 
-        <Button
-            android:id="@+id/btnContinue"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/button_rounded_orange"
-            android:text="CONTINUE"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:indeterminate="true"
+                android:layout_marginBottom="16dp" />
 
+            <TextView
+                android:id="@+id/tvWaitingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/waiting_title"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvWaitingSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/waiting_subtitle"
+                android:textColor="@color/gray_text"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Keep the resend option in case user needs it -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +104,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Didn't receive the code? "
+                android:text="@string/resend_email_prompt"
                 android:textColor="@color/gray_text"
                 android:textSize="14sp" />
 
@@ -99,7 +112,7 @@
                 android:id="@+id/tvResendCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Resend Code"
+                android:text="@string/resend_email"
                 android:textColor="@color/explora_orange"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -113,4 +126,3 @@
     </LinearLayout>
 
 </RelativeLayout>
-

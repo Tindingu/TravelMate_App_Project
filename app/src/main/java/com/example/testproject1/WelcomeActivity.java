@@ -62,6 +62,16 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_welcome);
 
         initFirebase();
@@ -106,10 +116,12 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void startGoogleSignIn() {
-        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            googleSignInLauncher.launch(signInIntent);
-        });
+//        mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+//            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+//            googleSignInLauncher.launch(signInIntent);
+//        });
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        googleSignInLauncher.launch(signInIntent);
     }
 
     private void handleGoogleSignInResult(ActivityResult result) {
@@ -150,9 +162,13 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
+//        btnFacebookSignIn.setOnClickListener(v -> {
+//            LoginManager.getInstance().logOut();
+//            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("email", "public_profile"));
+//        });
         btnFacebookSignIn.setOnClickListener(v -> {
-            LoginManager.getInstance().logOut();
-            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("email", "public_profile"));
+            LoginManager.getInstance()
+                    .logInWithReadPermissions(this, Arrays.asList("email", "public_profile"));
         });
     }
 

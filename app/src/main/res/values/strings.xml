@@ -3,4 +3,64 @@
     <string name="facebook_app_id">697839880030389</string>
     <string name="fb_login_protocol_scheme">697839880030389</string>
     <string name="facebook_client_token">857a75fe5e789efd896e4f88a3e752de</string>
+
+    <!-- Profile update strings -->
+    <string name="back">Back</string>
+    <string name="menu">Menu</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_picture">Change Picture</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="change_avatar">Update avatar</string>
+    <string name="change_username">Update username</string>
+    <string name="change_email">Update email</string>
+    <string name="change_phone">Update phone</string>
+    <string name="change_password">Update password</string>
+    <string name="edit">Edit</string>
+    <string name="edit_avatar">Edit avatar</string>
+    <string name="edit_username">Edit username</string>
+    <string name="edit_password">Edit password</string>
+    <string name="update">Save Changes</string>
+
+    <!-- Sample/display values (move to dynamic in code later) -->
+    <string name="sample_display_name">Khoa</string>
+    <string name="sample_username_value">khoavudang83340</string>
+    <string name="sample_email_value">khoavudang04@gmail.com</string>
+    <string name="sample_phone_value">+84876549999</string>
+    <string name="sample_password_mask">••••••••</string>
+
+    <!-- Change password strings -->
+    <string name="current_password">Current Password</string>
+    <string name="enter_current_password">Enter current password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="new_password">New Password</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="confirm_new_password_hint">Re-enter new password</string>
+    <string name="password_requirements">Password must be at least 8 characters long and contain uppercase, lowercase, number and special character.</string>
+
+    <!-- Change username screen -->
+    <string name="change_username_title">Change Username</string>
+    <string name="enter_username_hint">Enter username</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+
+    <!-- Email verify screen -->
+    <string name="email_verify_title">Verify Your Email</string>
+    <string name="email_verify_subtitle">A verification email has been sent to your address. Waiting for confirmation...</string>
+    <string name="waiting_title">Waiting for verification...</string>
+    <string name="waiting_subtitle">Please check your email. This screen will update automatically once your email is verified.</string>
+    <string name="resend_email_prompt">Didn\'t receive the email?</string>
+    <string name="resend_email">Resend Email</string>
+    <string name="back_button_description">Back</string>
+    <string name="tagline">- IF NOT NOW, WHEN? -</string>
+
+    <!-- New password screen -->
+    <string name="new_password_title">Set New Password</string>
+    <string name="new_password_subtitle">Create a strong password to protect your account</string>
+    <string name="new_password_hint">New Password</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="reset_password_btn">RESET PASSWORD</string>
+    <string name="toggle_password_visibility">Toggle password visibility</string>
 </resources>
