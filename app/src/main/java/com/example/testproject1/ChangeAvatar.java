@@ -3,6 +3,7 @@ package com.example.testproject1;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -214,14 +215,25 @@ public class ChangeAvatar extends AppCompatActivity {
             // - Rotate: User can rotate image 90° using built-in rotate button
             // - Scale: Pinch to zoom in/out
             // - Crop: Square aspect ratio (1:1) with draggable crop frame
+//            UCrop.Options options = new UCrop.Options();
+//            options.setToolbarTitle("Chỉnh sửa ảnh");
+//            options.setShowCropGrid(true);
+//            options.setShowCropFrame(true);
+//            // Enable free style crop
+//            options.setFreeStyleCropEnabled(true);
+//            // Set compression quality
+//            options.setCompressionQuality(90);
             UCrop.Options options = new UCrop.Options();
             options.setToolbarTitle("Chỉnh sửa ảnh");
-            options.setShowCropGrid(true);
-            options.setShowCropFrame(true);
-            // Enable free style crop
+
+// ⭐ QUAN TRỌNG
+            options.setStatusBarColor(Color.BLACK);
+            options.setToolbarColor(Color.BLACK);
+            options.setToolbarWidgetColor(Color.WHITE);
+
+// ⭐ TRÁNH DÍNH STATUS BAR
+            options.setHideBottomControls(false);
             options.setFreeStyleCropEnabled(true);
-            // Set compression quality
-            options.setCompressionQuality(90);
 
             UCrop.of(sourceUri, destinationUri)
                     .withAspectRatio(1, 1) // Square crop for avatar

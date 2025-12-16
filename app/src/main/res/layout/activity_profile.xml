@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    android:fillViewport="true">
 
     <LinearLayout
         android:orientation="vertical"
@@ -10,7 +13,7 @@
         android:layout_height="wrap_content"
         android:padding="20dp">
 
-        <!-- 🔹 Header -->
+        <!-- 🔹 HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,7 +26,7 @@
                 android:layout_height="24dp"
                 android:src="@drawable/ic_chevron_up"
                 android:rotation="270"
-                android:contentDescription="Back" />
+                tools:ignore="ContentDescription" />
 
             <View
                 android:layout_width="0dp"
@@ -36,23 +39,23 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="16dp"
                 android:src="@drawable/ic_menu"
-                android:contentDescription="Settings" />
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/ivNotification"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_ring"
-                android:contentDescription="Notifications" />
+                tools:ignore="ContentDescription" />
         </LinearLayout>
 
-        <!-- 🔹 Avatar + Info -->
+        <!-- 🔹 USER CARD -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/edittext_rounded_border"
             android:padding="16dp"
             android:orientation="horizontal"
+            android:background="@drawable/edittext_rounded_border"
             android:gravity="center_vertical"
             android:layout_marginTop="12dp">
 
@@ -60,10 +63,10 @@
                 android:id="@+id/ivAvatar"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:background="@drawable/avatar_circle_bg"
                 android:src="@drawable/avttest"
                 android:scaleType="centerCrop"
-                android:padding="2dp" />
+                android:background="@drawable/avatar_circle_bg"
+                tools:ignore="ContentDescription" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -107,7 +110,7 @@
                     android:id="@+id/tvJoinDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Since January 2021"
+                    android:text="Joined on ..."
                     android:textSize="13sp"
                     android:textColor="#777777"
                     android:layout_marginTop="4dp" />
@@ -116,10 +119,10 @@
                     android:id="@+id/tvMemberType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Member Gold"
-                    android:textSize="12sp"
+                    android:text="Member Bronze"
                     android:textColor="#FFFFFF"
-                    android:background="@drawable/button_rounded_orange"
+                    android:textSize="12sp"
+                    android:background="@drawable/button_rounded_bronze"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="4dp"
                     android:layout_marginTop="6dp" />
@@ -135,95 +138,107 @@
                 android:contentDescription="Edit Profile" />
         </LinearLayout>
 
-        <!-- 🔹 Wallet / Points / Voucher / PayLater -->
+        <!-- 🔥 POINTS + PROGRESS (GỘP CHUNG) -->
+        <LinearLayout
+            android:id="@+id/layoutPoints"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_rounded_border"
+            android:padding="16dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="16dp">
+
+            <!-- Icon + Số điểm -->
+            <ImageView
+                android:id="@+id/ivPoints"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_point"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tvPoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:textSize="22sp"
+                android:layout_marginTop="6dp" />
+
+            <TextView
+                android:id="@+id/tvPointsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Travel Points"
+                android:textColor="#777777"
+                android:textSize="13sp" />
+
+            <!-- Tiến độ level -->
+            <!-- Tiến độ level -->
+            <TextView
+                android:id="@+id/tvProgressTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tiến tới cấp độ tiếp theo"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:layout_marginTop="16dp"/>
+
+            <SeekBar
+                android:id="@+id/seekLevelProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="0"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvProgressPercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0%"
+                android:textColor="#777777"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
+
+            <!-- ⭐ THÊM MỚI: Bao nhiêu điểm nữa để lên cấp -->
+            <TextView
+                android:id="@+id/tvNextTier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Còn 100 điểm nữa để lên cấp Silver"
+                android:textColor="#444444"
+                android:textSize="13sp"
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+
+        <!-- 🔹 CHART CARD -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
             android:background="@drawable/edittext_rounded_border"
-            android:gravity="center"
-            android:weightSum="4">
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:layout_marginTop="16dp">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
+                android:text="Hoạt động gần đây"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000" />
 
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_wallet" />
-
-                <TextView
-                    android:text="Wallet"
-                    android:textSize="13sp"
-                    android:textColor="#000000"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_point" />
-                <TextView
-                    android:text="Points"
-                    android:textSize="13sp"
-                    android:textColor="#000000"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_voucher" />
-                <TextView
-                    android:text="Voucher"
-                    android:textSize="13sp"
-                    android:textColor="#000000"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_card" />
-                <TextView
-                    android:text="PayLater"
-                    android:textSize="13sp"
-                    android:textColor="#000000"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barChartProfileStats"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="10dp" />
         </LinearLayout>
-
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/barChartProfileStats"
             android:layout_width="match_parent"
@@ -232,15 +247,15 @@
             android:layout_marginBottom="16dp"
             android:padding="10dp" />
 
-        <!-- 🔹 Logout -->
+        <!-- 🔹 LOGOUT BUTTON -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="Logout"
             android:textAllCaps="false"
-            android:textStyle="bold"
             android:textColor="#FFFFFF"
+            android:textStyle="bold"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="40dp"
             android:background="@drawable/button_rounded_orange" />
