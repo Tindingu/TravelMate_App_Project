@@ -41,6 +41,12 @@
         <activity android:name=".ChatListActivity" />
         <activity android:name=".GroupChatActivity" />
         <activity android:name=".GroupDashboardActivity" />
+        <activity android:name=".AddMembersActivity" />
+        <activity android:name=".FindFriendsActivity" />
+        <activity android:name=".FriendRequestsActivity" />
+        <activity android:name=".CreateGroupActivity" />
+        <activity android:name=".NotificationsActivity" />
+        <activity android:name=".PrivateChatDashboardActivity" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

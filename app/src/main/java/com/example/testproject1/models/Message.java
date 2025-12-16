@@ -27,10 +27,18 @@ public class Message {
     private double longitude;
     private String locationName;
 
+    // Edit/Delete status
+    private boolean isEdited;
+    private Timestamp editedAt;
+    private String originalContent;
+    private boolean isDeleted;
+
     public Message() {
         // Required empty constructor for Firestore
         this.reactions = new HashMap<>();
         this.readBy = new ArrayList<>();
+        this.isEdited = false;
+        this.isDeleted = false;
     }
 
     public Message(String groupId, String senderId, String senderName, String senderAvatar, 
@@ -44,6 +52,8 @@ public class Message {
         this.timestamp = Timestamp.now();
         this.reactions = new HashMap<>();
         this.readBy = new ArrayList<>();
+        this.isEdited = false;
+        this.isDeleted = false;
     }
 
     // Getters and Setters
@@ -103,4 +113,16 @@ public class Message {
 
     public String getLocationName() { return locationName; }
     public void setLocationName(String locationName) { this.locationName = locationName; }
+
+    public boolean isEdited() { return isEdited; }
+    public void setEdited(boolean edited) { isEdited = edited; }
+
+    public Timestamp getEditedAt() { return editedAt; }
+    public void setEditedAt(Timestamp editedAt) { this.editedAt = editedAt; }
+
+    public String getOriginalContent() { return originalContent; }
+    public void setOriginalContent(String originalContent) { this.originalContent = originalContent; }
+
+    public boolean isDeleted() { return isDeleted; }
+    public void setDeleted(boolean deleted) { isDeleted = deleted; }
 }

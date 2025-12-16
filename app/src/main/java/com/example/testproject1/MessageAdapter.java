@@ -1,6 +1,7 @@
 package com.example.testproject1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,8 +89,60 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void bindSentMessage(SentMessageViewHolder holder, Message message) {
-        holder.tvMessage.setText(message.getContent());
-        holder.tvTime.setText(formatTime(message.getTimestamp().toDate()));
+        // Handle deleted message
+        if (message.isDeleted()) {
+            holder.tvMessage.setText("Tin nhắn đã bị xóa");
+            holder.tvMessage.setAlpha(0.5f);
+            holder.layoutReply.setVisibility(View.GONE);
+            holder.layoutReactions.setVisibility(View.GONE);
+            if (holder.ivMessageImage != null) holder.ivMessageImage.setVisibility(View.GONE);
+            holder.tvTime.setText(formatTime(message.getTimestamp().toDate()));
+            return;
+        }
+
+        holder.tvMessage.setAlpha(1.0f);
+
+        // Handle different message types
+        String type = message.getType();
+        if ("image".equals(type) && message.getImageUrl() != null) {
+            holder.tvMessage.setVisibility(View.GONE);
+            if (holder.ivMessageImage != null) {
+                holder.ivMessageImage.setVisibility(View.VISIBLE);
+                Glide.with(context)
+                        .load(message.getImageUrl())
+                        .placeholder(R.drawable.ic_camera)
+                        .into(holder.ivMessageImage);
+
+                // Click to view full image
+                holder.ivMessageImage.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(android.net.Uri.parse(message.getImageUrl()), "image/*");
+                    context.startActivity(intent);
+                });
+            }
+        } else if ("location".equals(type)) {
+            holder.tvMessage.setVisibility(View.VISIBLE);
+            holder.tvMessage.setText("📍 " + (message.getLocationName() != null ? message.getLocationName() : "Vị trí đã chia sẻ"));
+            if (holder.ivMessageImage != null) holder.ivMessageImage.setVisibility(View.GONE);
+
+            // Click to open in Maps
+            holder.itemView.setOnClickListener(v -> {
+                String uri = "geo:" + message.getLatitude() + "," + message.getLongitude() + "?q=" + message.getLatitude() + "," + message.getLongitude();
+                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
+                context.startActivity(intent);
+            });
+        } else {
+            holder.tvMessage.setVisibility(View.VISIBLE);
+            holder.tvMessage.setText(message.getContent());
+            if (holder.ivMessageImage != null) holder.ivMessageImage.setVisibility(View.GONE);
+        }
+
+        // Show edited indicator
+        String timeText = formatTime(message.getTimestamp().toDate());
+        if (message.isEdited()) {
+            timeText += " (đã chỉnh sửa)";
+        }
+        holder.tvTime.setText(timeText);
 
         // Show reply indicator if replying to another message
         if (message.getReplyToId() != null && message.getReplyToContent() != null) {
@@ -119,18 +172,65 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void bindReceivedMessage(ReceivedMessageViewHolder holder, Message message) {
         holder.tvSenderName.setText(message.getSenderName());
-        holder.tvMessage.setText(message.getContent());
-        holder.tvTime.setText(formatTime(message.getTimestamp().toDate()));
+
+        // Handle deleted message
+        if (message.isDeleted()) {
+            holder.tvMessage.setText("Tin nhắn đã bị xóa");
+            holder.tvMessage.setAlpha(0.5f);
+            holder.layoutReply.setVisibility(View.GONE);
+            holder.layoutReactions.setVisibility(View.GONE);
+            if (holder.ivMessageImage != null) holder.ivMessageImage.setVisibility(View.GONE);
+            holder.tvTime.setText(formatTime(message.getTimestamp().toDate()));
+            loadSenderAvatar(holder, message);
+            return;
+        }
+
+        holder.tvMessage.setAlpha(1.0f);
+
+        // Handle different message types
+        String type = message.getType();
+        if ("image".equals(type) && message.getImageUrl() != null) {
+            holder.tvMessage.setVisibility(View.GONE);
+            if (holder.ivMessageImage != null) {
+                holder.ivMessageImage.setVisibility(View.VISIBLE);
+                Glide.with(context)
+                        .load(message.getImageUrl())
+                        .placeholder(R.drawable.ic_camera)
+                        .into(holder.ivMessageImage);
+
+                // Click to view full image
+                holder.ivMessageImage.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(android.net.Uri.parse(message.getImageUrl()), "image/*");
+                    context.startActivity(intent);
+                });
+            }
+        } else if ("location".equals(type)) {
+            holder.tvMessage.setVisibility(View.VISIBLE);
+            holder.tvMessage.setText("📍 " + (message.getLocationName() != null ? message.getLocationName() : "Vị trí đã chia sẻ"));
+            if (holder.ivMessageImage != null) holder.ivMessageImage.setVisibility(View.GONE);
+
+            // Click to open in Maps
+            holder.itemView.setOnClickListener(v -> {
+                String uri = "geo:" + message.getLatitude() + "," + message.getLongitude() + "?q=" + message.getLatitude() + "," + message.getLongitude();
+                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
+                context.startActivity(intent);
+            });
+        } else {
+            holder.tvMessage.setVisibility(View.VISIBLE);
+            holder.tvMessage.setText(message.getContent());
+            if (holder.ivMessageImage != null) holder.ivMessageImage.setVisibility(View.GONE);
+        }
+
+        // Show edited indicator
+        String timeText = formatTime(message.getTimestamp().toDate());
+        if (message.isEdited()) {
+            timeText += " (đã chỉnh sửa)";
+        }
+        holder.tvTime.setText(timeText);
 
         // Load sender avatar
-        if (message.getSenderAvatar() != null && !message.getSenderAvatar().isEmpty()) {
-            Glide.with(context)
-                    .load(message.getSenderAvatar())
-                    .placeholder(R.drawable.avttest)
-                    .into(holder.ivSenderAvatar);
-        } else {
-            holder.ivSenderAvatar.setImageResource(R.drawable.avttest);
-        }
+        loadSenderAvatar(holder, message);
 
         // Show reply indicator if replying to another message
         if (message.getReplyToId() != null && message.getReplyToContent() != null) {
@@ -156,6 +256,17 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
             return true;
         });
+    }
+
+    private void loadSenderAvatar(ReceivedMessageViewHolder holder, Message message) {
+        if (message.getSenderAvatar() != null && !message.getSenderAvatar().isEmpty()) {
+            Glide.with(context)
+                    .load(message.getSenderAvatar())
+                    .placeholder(R.drawable.avttest)
+                    .into(holder.ivSenderAvatar);
+        } else {
+            holder.ivSenderAvatar.setImageResource(R.drawable.avttest);
+        }
     }
 
     private void bindSystemMessage(SystemMessageViewHolder holder, Message message) {
@@ -200,6 +311,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage, tvTime, tvReplyToName, tvReplyToContent, tvReactions;
         LinearLayout layoutReply, layoutReactions;
+        ImageView ivMessageImage;
 
         SentMessageViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -210,12 +322,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tvReactions = itemView.findViewById(R.id.tvReactions);
             layoutReply = itemView.findViewById(R.id.layoutReply);
             layoutReactions = itemView.findViewById(R.id.layoutReactions);
+            ivMessageImage = itemView.findViewById(R.id.ivMessageImage);
         }
     }
 
     // ViewHolder for received messages
     static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivSenderAvatar;
+        ImageView ivSenderAvatar, ivMessageImage;
         TextView tvSenderName, tvMessage, tvTime, tvReplyToName, tvReplyToContent, tvReactions;
         LinearLayout layoutReply, layoutReactions;
 
@@ -230,6 +343,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tvReactions = itemView.findViewById(R.id.tvReactions);
             layoutReply = itemView.findViewById(R.id.layoutReply);
             layoutReactions = itemView.findViewById(R.id.layoutReactions);
+            ivMessageImage = itemView.findViewById(R.id.ivMessageImage);
         }
     }
 

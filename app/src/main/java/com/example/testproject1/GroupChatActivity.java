@@ -1,10 +1,16 @@
 package com.example.testproject1;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -12,26 +18,40 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.testproject1.models.ChatGroup;
 import com.example.testproject1.models.Message;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 public class GroupChatActivity extends AppCompatActivity {
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
 
     private TextView tvGroupName, tvMemberCount;
     private RecyclerView rvMessages;
@@ -47,10 +67,16 @@ public class GroupChatActivity extends AppCompatActivity {
     private String groupId;
     private String groupName;
     private Message replyToMessage;
+    private boolean isPrivateChat = false;
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
+    private FirebaseStorage storage;
+    private FusedLocationProviderClient fusedLocationClient;
+
+    // Activity Result Launcher for image picker
+    private ActivityResultLauncher<String> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +86,19 @@ public class GroupChatActivity extends AppCompatActivity {
         // Get group info from intent
         groupId = getIntent().getStringExtra("groupId");
         groupName = getIntent().getStringExtra("groupName");
+        isPrivateChat = getIntent().getBooleanExtra("isPrivateChat", false);
 
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         currentUser = auth.getCurrentUser();
+        storage = FirebaseStorage.getInstance();
+
+        // Initialize Location Client
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Initialize Image Picker
+        setupImagePicker();
 
         // Initialize views
         initViews();
@@ -80,6 +114,17 @@ public class GroupChatActivity extends AppCompatActivity {
 
         // Setup listeners
         setupListeners();
+    }
+
+    private void setupImagePicker() {
+        imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            uri -> {
+                if (uri != null) {
+                    uploadAndSendImage(uri);
+                }
+            }
+        );
     }
 
     private void initViews() {
@@ -158,9 +203,31 @@ public class GroupChatActivity extends AppCompatActivity {
 
                     ChatGroup group = value.toObject(ChatGroup.class);
                     if (group != null) {
-                        tvGroupName.setText(group.getName());
-                        int memberCount = group.getMemberIds() != null ? group.getMemberIds().size() : 0;
-                        tvMemberCount.setText(memberCount + " thành viên");
+                        // Kiểm tra nếu là chat riêng
+                        Boolean isGroup = value.getBoolean("isGroup");
+                        isPrivateChat = isGroup != null && !isGroup;
+
+                        if (isPrivateChat) {
+                            // Chat riêng - hiển thị tên của người kia
+                            String user1Id = value.getString("user1Id");
+                            String user2Id = value.getString("user2Id");
+                            String user1Name = value.getString("user1Name");
+                            String user2Name = value.getString("user2Name");
+
+                            // Hiển thị tên người còn lại
+                            if (currentUser != null && currentUser.getUid().equals(user1Id)) {
+                                tvGroupName.setText(user2Name);
+                            } else {
+                                tvGroupName.setText(user1Name);
+                            }
+                            tvMemberCount.setVisibility(View.GONE);
+                        } else {
+                            // Chat nhóm
+                            tvGroupName.setText(group.getName());
+                            int memberCount = group.getMemberIds() != null ? group.getMemberIds().size() : 0;
+                            tvMemberCount.setText(memberCount + " thành viên");
+                            tvMemberCount.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
     }
@@ -169,9 +236,15 @@ public class GroupChatActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         btnMenu.setOnClickListener(v -> {
-            Intent intent = new Intent(this, GroupDashboardActivity.class);
+            Intent intent;
+            if (isPrivateChat) {
+                intent = new Intent(this, PrivateChatDashboardActivity.class);
+            } else {
+                intent = new Intent(this, GroupDashboardActivity.class);
+            }
             intent.putExtra("groupId", groupId);
             intent.putExtra("groupName", groupName);
+            intent.putExtra("isPrivateChat", isPrivateChat);
             startActivity(intent);
         });
 
@@ -201,18 +274,18 @@ public class GroupChatActivity extends AppCompatActivity {
 
         btnCancelReply.setOnClickListener(v -> cancelReply());
 
-        // Toolbar buttons
-        btnImage.setOnClickListener(v -> 
-            Toast.makeText(this, "Tính năng gửi ảnh đang phát triển", Toast.LENGTH_SHORT).show());
-        
-        btnAttach.setOnClickListener(v -> 
+        // Toolbar buttons - Image picker
+        btnImage.setOnClickListener(v -> openImagePicker());
+
+        // Toolbar buttons - File attachment
+        btnAttach.setOnClickListener(v ->
             Toast.makeText(this, "Tính năng đính kèm đang phát triển", Toast.LENGTH_SHORT).show());
         
-        btnLocation.setOnClickListener(v -> 
-            Toast.makeText(this, "Tính năng gửi vị trí đang phát triển", Toast.LENGTH_SHORT).show());
-        
-        btnTask.setOnClickListener(v -> 
-            Toast.makeText(this, "Tính năng tạo task đang phát triển", Toast.LENGTH_SHORT).show());
+        // Toolbar buttons - Send location
+        btnLocation.setOnClickListener(v -> sendCurrentLocation());
+
+        // Toolbar buttons - Create task
+        btnTask.setOnClickListener(v -> showCreateTaskDialog());
     }
 
     private void sendMessage() {
@@ -291,17 +364,36 @@ public class GroupChatActivity extends AppCompatActivity {
     }
 
     private void showMessageOptions(Message message) {
-        String[] options = {"Trả lời", "Thả cảm xúc"};
-        
+        // Check if current user is the sender
+        boolean isOwnMessage = message.getSenderId().equals(currentUser.getUid());
+
+        String[] options;
+        if (isOwnMessage) {
+            options = new String[]{"Trả lời", "Thả cảm xúc", "Chỉnh sửa", "Xóa tin nhắn"};
+        } else {
+            options = new String[]{"Trả lời", "Thả cảm xúc"};
+        }
+
         new AlertDialog.Builder(this)
                 .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        // Reply to message
-                        replyToMessage = message;
-                        showReplyPreview();
-                    } else if (which == 1) {
-                        // Show reaction options
-                        showReactionOptions(message);
+                    switch (which) {
+                        case 0: // Reply
+                            replyToMessage = message;
+                            showReplyPreview();
+                            break;
+                        case 1: // Reaction
+                            showReactionOptions(message);
+                            break;
+                        case 2: // Edit (only for own messages)
+                            if (isOwnMessage) {
+                                showEditMessageDialog(message);
+                            }
+                            break;
+                        case 3: // Delete (only for own messages)
+                            if (isOwnMessage) {
+                                showDeleteConfirmDialog(message);
+                            }
+                            break;
                     }
                 })
                 .show();
@@ -355,5 +447,274 @@ public class GroupChatActivity extends AppCompatActivity {
         db.collection("chat_groups")
                 .document(groupId)
                 .update("unreadCount." + userId, 0);
+    }
+
+    // ========== IMAGE UPLOAD FEATURE ==========
+
+    private void openImagePicker() {
+        imagePickerLauncher.launch("image/*");
+    }
+
+    private void uploadAndSendImage(Uri imageUri) {
+        if (currentUser == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Show loading
+        Toast.makeText(this, "Đang tải ảnh lên...", Toast.LENGTH_SHORT).show();
+
+        String fileName = "chat_images/" + groupId + "/" + UUID.randomUUID().toString() + ".jpg";
+        StorageReference ref = storage.getReference().child(fileName);
+
+        ref.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                        sendImageMessage(uri.toString());
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi tải ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void sendImageMessage(String imageUrl) {
+        Message message = new Message(
+                groupId,
+                currentUser.getUid(),
+                currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User",
+                currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : "",
+                "📷 Hình ảnh",
+                "image"
+        );
+        message.setImageUrl(imageUrl);
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .collection("messages")
+                .add(message)
+                .addOnSuccessListener(documentReference -> {
+                    updateGroupLastMessage(message);
+                    Toast.makeText(this, "Đã gửi ảnh", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                    Toast.makeText(this, "Lỗi gửi ảnh", Toast.LENGTH_SHORT).show());
+    }
+
+    // ========== LOCATION FEATURE ==========
+
+    private void sendCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+            return;
+        }
+
+        Toast.makeText(this, "Đang lấy vị trí...", Toast.LENGTH_SHORT).show();
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        double lat = location.getLatitude();
+                        double lng = location.getLongitude();
+                        String address = getAddressFromCoordinates(lat, lng);
+                        sendLocationMessage(lat, lng, address);
+                    } else {
+                        Toast.makeText(this, "Không thể lấy vị trí", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi lấy vị trí: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private String getAddressFromCoordinates(double lat, double lng) {
+        try {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                return address.getAddressLine(0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Vị trí: " + lat + ", " + lng;
+    }
+
+    private void sendLocationMessage(double lat, double lng, String locationName) {
+        if (currentUser == null) return;
+
+        Message message = new Message(
+                groupId,
+                currentUser.getUid(),
+                currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User",
+                currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : "",
+                "📍 " + locationName,
+                "location"
+        );
+        message.setLatitude(lat);
+        message.setLongitude(lng);
+        message.setLocationName(locationName);
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .collection("messages")
+                .add(message)
+                .addOnSuccessListener(documentReference -> {
+                    updateGroupLastMessage(message);
+                    Toast.makeText(this, "Đã gửi vị trí", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                    Toast.makeText(this, "Lỗi gửi vị trí", Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sendCurrentLocation();
+            } else {
+                Toast.makeText(this, "Cần quyền vị trí để gửi", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // ========== EDIT MESSAGE FEATURE ==========
+
+    private void showEditMessageDialog(Message message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Chỉnh sửa tin nhắn");
+
+        final EditText input = new EditText(this);
+        input.setText(message.getContent());
+        input.setSelection(message.getContent().length());
+        builder.setView(input);
+
+        builder.setPositiveButton("Lưu", (dialog, which) -> {
+            String newContent = input.getText().toString().trim();
+            if (!newContent.isEmpty() && !newContent.equals(message.getContent())) {
+                editMessage(message, newContent);
+            }
+        });
+
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void editMessage(Message message, String newContent) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("content", newContent);
+        updates.put("isEdited", true);
+        updates.put("editedAt", Timestamp.now());
+        if (message.getOriginalContent() == null) {
+            updates.put("originalContent", message.getContent());
+        }
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .collection("messages")
+                .document(message.getId())
+                .update(updates)
+                .addOnSuccessListener(aVoid ->
+                    Toast.makeText(this, "Đã chỉnh sửa tin nhắn", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e ->
+                    Toast.makeText(this, "Lỗi chỉnh sửa: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    // ========== DELETE MESSAGE FEATURE ==========
+
+    private void showDeleteConfirmDialog(Message message) {
+        new AlertDialog.Builder(this)
+                .setTitle("Xóa tin nhắn")
+                .setMessage("Bạn có chắc muốn xóa tin nhắn này?")
+                .setPositiveButton("Xóa", (dialog, which) -> deleteMessage(message))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void deleteMessage(Message message) {
+        // Soft delete - update isDeleted flag
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("isDeleted", true);
+        updates.put("content", "Tin nhắn đã bị xóa");
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .collection("messages")
+                .document(message.getId())
+                .update(updates)
+                .addOnSuccessListener(aVoid ->
+                    Toast.makeText(this, "Đã xóa tin nhắn", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e ->
+                    Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    // ========== TASK FEATURE ==========
+
+    private void showCreateTaskDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_create_task, null);
+        builder.setView(dialogView);
+
+        EditText etTaskTitle = dialogView.findViewById(R.id.etTaskTitle);
+        EditText etTaskDescription = dialogView.findViewById(R.id.etTaskDescription);
+
+        builder.setTitle("Tạo công việc mới");
+        builder.setPositiveButton("Tạo", (dialog, which) -> {
+            String title = etTaskTitle.getText().toString().trim();
+            String description = etTaskDescription.getText().toString().trim();
+            if (!title.isEmpty()) {
+                createTask(title, description);
+            } else {
+                Toast.makeText(this, "Vui lòng nhập tiêu đề", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Hủy", null);
+        builder.show();
+    }
+
+    private void createTask(String title, String description) {
+        if (currentUser == null) return;
+
+        Map<String, Object> task = new HashMap<>();
+        task.put("title", title);
+        task.put("description", description);
+        task.put("createdBy", currentUser.getUid());
+        task.put("createdByName", currentUser.getDisplayName());
+        task.put("createdAt", Timestamp.now());
+        task.put("status", "pending");
+        task.put("assignedTo", new ArrayList<String>());
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .collection("tasks")
+                .add(task)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(this, "Đã tạo công việc", Toast.LENGTH_SHORT).show();
+                    // Send system message about new task
+                    sendSystemMessage("📋 " + currentUser.getDisplayName() + " đã tạo công việc: " + title);
+                })
+                .addOnFailureListener(e ->
+                    Toast.makeText(this, "Lỗi tạo công việc: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void sendSystemMessage(String content) {
+        Message message = new Message(
+                groupId,
+                "system",
+                "Hệ thống",
+                "",
+                content,
+                "system"
+        );
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .collection("messages")
+                .add(message);
     }
 }

@@ -164,12 +164,13 @@ public class ChatListActivity extends AppCompatActivity {
 
         // Action buttons
         btnAddFriend.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng thêm bạn đang phát triển", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, FindFriendsActivity.class);
+            startActivity(intent);
         });
 
         btnCreateGroup.setOnClickListener(v -> {
-            // TODO: Open CreateGroupActivity when implemented
-            Toast.makeText(this, "Tính năng tạo nhóm đang phát triển", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, CreateGroupActivity.class);
+            startActivity(intent);
         });
     }
 

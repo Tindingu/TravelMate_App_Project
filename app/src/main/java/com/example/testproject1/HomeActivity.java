@@ -570,6 +570,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else if (v.getId() == R.id.navChat) {
             startActivity(new Intent(this, ChatListActivity.class));
             overridePendingTransition(0, 0);
+        } else if (v.getId() == R.id.navNotification) {
+            startActivity(new Intent(this, NotificationsActivity.class));
+            overridePendingTransition(0, 0);
         }
     }
 

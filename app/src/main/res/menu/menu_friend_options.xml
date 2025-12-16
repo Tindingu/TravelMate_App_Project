@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_start_chat"
+        android:title="Liên hệ" />
+    <item
+        android:id="@+id/action_add_to_group"
+        android:title="Thêm vào nhóm" />
+    <item
+        android:id="@+id/action_remove_friend"
+        android:title="Xóa bạn bè" />
+</menu>
+

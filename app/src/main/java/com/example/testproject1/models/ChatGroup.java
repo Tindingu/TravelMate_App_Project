@@ -11,6 +11,7 @@ public class ChatGroup {
     private String name;
     private String avatarUrl;
     private List<String> memberIds;
+    private List<String> adminIds; // Danh sách admin của nhóm
     private String lastMessageContent;
     private String lastMessageSenderId;
     private String lastMessageSenderName;
@@ -21,10 +22,12 @@ public class ChatGroup {
     private boolean isArchived;
     private boolean isMuted;
     private boolean isPinned;
+    private boolean isGroup; // true = nhóm chat, false = chat 1-1
 
     public ChatGroup() {
         // Required empty constructor for Firestore
         this.memberIds = new ArrayList<>();
+        this.adminIds = new ArrayList<>();
         this.unreadCount = new HashMap<>();
     }
 
@@ -32,11 +35,14 @@ public class ChatGroup {
         this.name = name;
         this.createdBy = createdBy;
         this.memberIds = memberIds;
+        this.adminIds = new ArrayList<>();
+        this.adminIds.add(createdBy); // Người tạo mặc định là admin
         this.createdAt = Timestamp.now();
         this.unreadCount = new HashMap<>();
         this.isArchived = false;
         this.isMuted = false;
         this.isPinned = false;
+        this.isGroup = true;
     }
 
     // Getters and Setters
@@ -91,4 +97,20 @@ public class ChatGroup {
 
     public boolean isPinned() { return isPinned; }
     public void setPinned(boolean pinned) { isPinned = pinned; }
+
+    public List<String> getAdminIds() { return adminIds; }
+    public void setAdminIds(List<String> adminIds) { this.adminIds = adminIds; }
+
+    public boolean isGroup() { return isGroup; }
+    public void setGroup(boolean group) { isGroup = group; }
+
+    // Kiểm tra user có phải admin không
+    public boolean isAdmin(String userId) {
+        return adminIds != null && adminIds.contains(userId);
+    }
+
+    // Kiểm tra user có phải người tạo không
+    public boolean isCreator(String userId) {
+        return createdBy != null && createdBy.equals(userId);
+    }
 }
