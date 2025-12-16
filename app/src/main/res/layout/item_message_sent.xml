@@ -40,7 +40,6 @@
                     android:id="@+id/tvReplyToName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nguyễn Văn A"
                     android:textSize="11sp"
                     android:textStyle="bold"
                     android:textColor="#FF6B35" />
@@ -49,7 +48,6 @@
                     android:id="@+id/tvReplyToContent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Original message"
                     android:textSize="11sp"
                     android:textColor="#666666"
                     android:maxLines="2"
@@ -72,13 +70,13 @@
                 android:layout_height="150dp"
                 android:scaleType="centerCrop"
                 android:visibility="gone"
-                android:adjustViewBounds="true" />
+                android:adjustViewBounds="true"
+                android:contentDescription="Message Image" />
 
             <TextView
                 android:id="@+id/tvMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@All mai đi mấy giờ?"
                 android:textSize="14sp"
                 android:textColor="#FFFFFF" />
 
@@ -95,8 +93,7 @@
                     android:id="@+id/tvReactions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="❤️ 2  👍 1"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     android:textColor="#FFFFFF" />
             </LinearLayout>
         </LinearLayout>
@@ -113,7 +110,6 @@
                 android:id="@+id/tvTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="19:07"
                 android:textSize="11sp"
                 android:textColor="#999999" />
 
@@ -132,7 +128,8 @@
                     android:layout_height="16dp"
                     android:background="@drawable/avatar_circle_bg"
                     android:src="@drawable/avttest"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Read receipt" />
 
                 <ImageView
                     android:id="@+id/ivReadReceipt2"
@@ -142,7 +139,8 @@
                     android:background="@drawable/avatar_circle_bg"
                     android:src="@drawable/avttest"
                     android:scaleType="centerCrop"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:contentDescription="Read receipt" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
