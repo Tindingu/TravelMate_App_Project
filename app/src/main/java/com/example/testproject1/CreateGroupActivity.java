@@ -17,6 +17,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,8 @@ public class CreateGroupActivity extends AppCompatActivity {
     private UserSelectionAdapter adapter;
     private List<Map<String, Object>> allFriends;
     private List<String> selectedUserIds;
+    private ListenerRegistration friendListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,35 +87,45 @@ public class CreateGroupActivity extends AppCompatActivity {
     private void loadFriends() {
         String userId = currentUser.getUid();
 
-        db.collection("users").document(userId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        List<String> friendIds = (List<String>) documentSnapshot.get("friendIds");
+        if (friendListener != null) {
+            friendListener.remove(); // tránh listen trùng
+        }
 
-                        if (friendIds != null && !friendIds.isEmpty()) {
-                            tvFriendsTitle.setText("Chọn thành viên từ bạn bè (" + friendIds.size() + ")");
-                            loadFriendsInfo(friendIds);
-                        } else {
-                            showEmptyState();
-                        }
-                    } else {
+        friendListener = db.collection("users")
+                .document(userId)
+                .addSnapshotListener((snapshot, e) -> {
+
+                    if (e != null || snapshot == null || !snapshot.exists()) {
                         showEmptyState();
+                        return;
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
-                    showEmptyState();
+
+                    List<String> friendIds = (List<String>) snapshot.get("friendIds");
+
+                    allFriends.clear();
+                    selectedUserIds.clear();
+                    adapter.notifyDataSetChanged();
+
+                    if (friendIds == null || friendIds.isEmpty()) {
+                        showEmptyState();
+                        return;
+                    }
+
+                    tvFriendsTitle.setText("Chọn thành viên từ bạn bè (" + friendIds.size() + ")");
+                    loadFriendsInfo(friendIds);
                 });
     }
 
     private void loadFriendsInfo(List<String> friendIds) {
-        allFriends.clear();
+        final int total = friendIds.size();
+        final int[] loaded = {0};
 
         for (String friendId : friendIds) {
             db.collection("users").document(friendId)
                     .get()
                     .addOnSuccessListener(doc -> {
+                        loaded[0]++;
+
                         if (doc.exists()) {
                             Map<String, Object> friend = new HashMap<>();
                             friend.put("userId", doc.getId());
@@ -120,13 +133,17 @@ public class CreateGroupActivity extends AppCompatActivity {
                             friend.put("email", doc.getString("email"));
                             friend.put("avatar", doc.getString("avatarUrl"));
                             allFriends.add(friend);
+                        }
 
+                        // ✅ CHỈ notify khi load xong hết
+                        if (loaded[0] == total) {
                             adapter.notifyDataSetChanged();
                             hideEmptyState();
                         }
                     });
         }
     }
+
 
     private void showEmptyState() {
         layoutEmpty.setVisibility(View.VISIBLE);
@@ -232,7 +249,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Reload friends khi quay lại (có thể đã thêm bạn mới)
-        loadFriends();
+//        loadFriends();
     }
 }
 

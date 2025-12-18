@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:paddingTop="16dp"
             android:layout_marginBottom="12dp">
 
             <TextView
@@ -28,9 +29,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Tin nhắn"
+                android:textColor="#333333"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#333333" />
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/btnAddFriend"
