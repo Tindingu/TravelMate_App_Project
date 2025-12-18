@@ -26,12 +26,6 @@
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:theme="@style/Theme.UCrop.Fixed"
-            android:screenOrientation="portrait"
-            android:exported="false" />
-
 
         <activity
             android:name=".WelcomeActivity"
@@ -52,6 +46,15 @@
         <activity android:name=".ForgotPasswordActivity" />
         <activity android:name=".WishlistActivity" />
         <activity android:name=".PlaceDetailActivity" />
+        <activity android:name=".ChatListActivity" />
+        <activity android:name=".GroupChatActivity" />
+        <activity android:name=".GroupDashboardActivity" />
+        <activity android:name=".AddMembersActivity" />
+        <activity android:name=".FindFriendsActivity" />
+        <activity android:name=".FriendRequestsActivity" />
+        <activity android:name=".CreateGroupActivity" />
+        <activity android:name=".NotificationsActivity" />
+        <activity android:name=".PrivateChatDashboardActivity" />
         <activity android:name=".MyTripsActivity"/>
         <activity android:name=".TripDetailActivity"/>
 

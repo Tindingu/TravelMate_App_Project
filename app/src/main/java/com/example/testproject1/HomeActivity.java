@@ -66,13 +66,11 @@ import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    // =========================
     // UI
-    // =========================
-    private LinearLayout navHome, navBookmark, navCalendar, navNotification;
-    private TextView tvHello;
-    private ImageView ivProfile, ivSearchBtn;
-    private EditText etSearch;
+    LinearLayout navHome, navBookmark, navChat, navCalendar, navNotification;
+    TextView tvHello;
+    ImageView ivProfile, ivSearchBtn;
+    EditText etSearch;
 
     // RecyclerView
     private RecyclerView rvPlaces;
@@ -124,7 +122,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = auth.getCurrentUser();
-
         queue = Volley.newRequestQueue(this);
         gpt = new GeminiService(API_KEY_GEMINI);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -166,6 +163,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initViews() {
         navHome = findViewById(R.id.navHome);
         navBookmark = findViewById(R.id.navBookmark);
+        navChat = findViewById(R.id.navChat);
         navCalendar = findViewById(R.id.navCalendar);
         navNotification = findViewById(R.id.navNotification);
 
@@ -328,7 +326,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-
     private void requestRoute(double startLat, double startLon, double endLat, double endLon) {
         if (mMap == null) return;
         mMap.clear(); // Xóa tất cả marker và polyline cũ
@@ -384,6 +381,8 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
+
+
 
     // ============================================================
     // ⭐ AI → NOMINATIM → OSM SEARCH
@@ -632,6 +631,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         queue.add(req);
     }
 
+    // ============================================================
+    // ⭐ WISHLIST
+    // ============================================================
     private void addToWishlist(PlaceModel place) {
         if (user == null) return;
 
@@ -956,11 +958,15 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    // ============================================================
+    // ⭐ NAV
+    // ============================================================
     private void setupBottomNav() {
         setActive(navHome);
 
         navHome.setOnClickListener(this::onNavClick);
         navBookmark.setOnClickListener(this::onNavClick);
+        navChat.setOnClickListener(this::onNavClick);
         navCalendar.setOnClickListener(this::onNavClick);
         navNotification.setOnClickListener(this::onNavClick);
     }
@@ -975,14 +981,19 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else if (v.getId() == R.id.navCalendar) {
             startActivity(new Intent(this, MyTripsActivity.class));
             overridePendingTransition(0, 0);
+        } else if (v.getId() == R.id.navChat) {
+            startActivity(new Intent(this, ChatListActivity.class));
+            overridePendingTransition(0, 0);
         } else if (v.getId() == R.id.navNotification) {
-            Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, NotificationsActivity.class));
+            overridePendingTransition(0, 0);
         }
     }
 
     private void resetNav() {
         navHome.setBackground(null);
         navBookmark.setBackground(null);
+        navChat.setBackground(null);
         navCalendar.setBackground(null);
         navNotification.setBackground(null);
     }

@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection
+    match /users/{userId} {
+      // Cho phép đọc tất cả users (để tìm kiếm)
+      allow read: if request.auth != null;
+
+      // Chỉ cho phép user chỉnh sửa profile của chính mình
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Friend requests collection
+    match /friend_requests/{requestId} {
+      // Cho phép đọc nếu là người gửi hoặc người nhận
+      allow read: if request.auth != null &&
+        (resource.data.senderId == request.auth.uid ||
+         resource.data.receiverId == request.auth.uid);
+
+      // Cho phép tạo mới nếu đã đăng nhập
+      allow create: if request.auth != null &&
+        request.resource.data.senderId == request.auth.uid;
+
+      // Cho phép cập nhật nếu là người nhận (accept/reject)
+      allow update: if request.auth != null &&
+        resource.data.receiverId == request.auth.uid;
+
+      // Cho phép xóa nếu là người gửi (cancel request)
+      allow delete: if request.auth != null &&
+        resource.data.senderId == request.auth.uid;
+    }
+
+    // Chat groups collection
+    match /chat_groups/{groupId} {
+      // Cho phép đọc nếu là thành viên
+      allow read: if request.auth != null &&
+        request.auth.uid in resource.data.memberIds;
+
+      // Cho phép tạo nếu đã đăng nhập
+      allow create: if request.auth != null;
+
+      // Cho phép cập nhật nếu là thành viên
+      allow update: if request.auth != null &&
+        request.auth.uid in resource.data.memberIds;
+
+      // Cho phép xóa nếu là admin
+      allow delete: if request.auth != null &&
+        request.auth.uid in resource.data.adminIds;
+
+      // Messages subcollection
+      match /messages/{messageId} {
+        // Cho phép đọc nếu là thành viên của nhóm
+        allow read: if request.auth != null &&
+          request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(groupId)).data.memberIds;
+
+        // Cho phép tạo nếu là thành viên
+        allow create: if request.auth != null &&
+          request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(groupId)).data.memberIds;
+
+        // Cho phép cập nhật (edit, reaction) nếu là thành viên
+        allow update: if request.auth != null &&
+          request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(groupId)).data.memberIds;
+
+        // Cho phép xóa nếu là người gửi hoặc admin
+        allow delete: if request.auth != null &&
+          (resource.data.senderId == request.auth.uid ||
+           request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(groupId)).data.adminIds);
+      }
+
+      // Tasks subcollection
+      match /tasks/{taskId} {
+        allow read, write: if request.auth != null &&
+          request.auth.uid in get(/databases/$(database)/documents/chat_groups/$(groupId)).data.memberIds;
+      }
+    }
+  }
+}
+

@@ -63,4 +63,32 @@
     <string name="confirm_password_hint">Confirm Password</string>
     <string name="reset_password_btn">RESET PASSWORD</string>
     <string name="toggle_password_visibility">Toggle password visibility</string>
+
+    <!-- Chat Strings -->
+    <string name="chat_messages">Tin nhắn</string>
+    <string name="chat_search">Tìm kiếm</string>
+    <string name="chat_all">All</string>
+    <string name="chat_archived">Archived</string>
+    <string name="chat_add_friend">Add Friend</string>
+    <string name="chat_create_group">Create Group</string>
+    <string name="chat_members">thành viên</string>
+    <string name="chat_input_hint">Nhập @, tin nhắn tới...</string>
+    <string name="chat_you">Bạn</string>
+    <string name="chat_reply">Trả lời</string>
+    <string name="chat_react">Thả cảm xúc</string>
+    <string name="chat_group_info">Thông tin nhóm</string>
+    <string name="chat_search_messages">Tìm tin nhắn</string>
+    <string name="chat_mute_notifications">Tắt thông báo</string>
+    <string name="chat_pin">Ghim</string>
+    <string name="chat_add_members">Thêm</string>
+    <string name="chat_group_members">Thành viên nhóm</string>
+    <string name="chat_bulletin_board">Bảng tin nhóm</string>
+    <string name="chat_bulletin_desc">Ghim thông tin quan trọng: lịch trình, vé máy bay, deadline</string>
+    <string name="chat_media_library">Kho Ảnh/Video</string>
+    <string name="chat_files_links">Kho File/Link</string>
+    <string name="chat_file">File</string>
+    <string name="chat_link">Link</string>
+    <string name="chat_leave_group">Rời nhóm</string>
+    <string name="chat_edit_group_name">Chỉnh sửa tên nhóm</string>
+    <string name="chat_leave_group_confirm">Bạn có chắc muốn rời khỏi nhóm này?</string>
 </resources>
