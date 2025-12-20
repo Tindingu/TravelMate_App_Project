@@ -58,21 +58,7 @@ public class TripAlarmReceiver extends BroadcastReceiver {
         // ✅ SHOW NOTIFICATION
         manager.notify((int) System.currentTimeMillis(), notification);
         // 🔹 BỔ SUNG – KHÔNG ẢNH HƯỞNG CODE CŨ
-//        // =========================
-//        String tripId = intent.getStringExtra("tripId");
-//        String tripName = intent.getStringExtra("tripName");
-//        String userId = intent.getStringExtra("userId");
-//        String groupId = intent.getStringExtra("groupId"); // có thể null
-//
-//        // 1️⃣ LƯU THÔNG BÁO TRONG APP
-//        if (userId != null && tripId != null) {
-//            saveInAppNotification(tripId, tripName, userId);
-//        }
-//
-//        // 2️⃣ GỬI THÔNG BÁO VÀO GROUP (NẾU CÓ)
-//        if (groupId != null && !groupId.isEmpty()) {
-//            sendGroupSystemMessage(groupId, tripName);
-//        }
+
         // =========================
 // 🔹 BỔ SUNG – DEBUG LOG
 // =========================
@@ -108,13 +94,62 @@ public class TripAlarmReceiver extends BroadcastReceiver {
         }
 
 // 2️⃣ GỬI THÔNG BÁO VÀO GROUP (NẾU CÓ)
+        // 2️⃣ GỬI THÔNG BÁO VÀO GROUP (NẾU CÓ)
         if (groupId != null && !groupId.isEmpty()) {
-            Log.d("DEBUG_ALARM", "✅ VÀO sendGroupSystemMessage()");
-            sendGroupSystemMessage(groupId,tripId, tripName,namePlace,addressPlace,date,start,end);
+
+            // ✅ CASE 1: Intent đã có groupId
+            Log.d("DEBUG_ALARM", "✅ groupId từ Intent → gửi vào group chat");
+            sendGroupSystemMessage(
+                    groupId,
+                    tripId,
+                    tripName,
+                    namePlace,
+                    addressPlace,
+                    date,
+                    start,
+                    end
+            );
+
         } else {
-            Log.e("DEBUG_ALARM", "❌ KHÔNG vào sendGroupSystemMessage() "
-                    + "(groupId null hoặc rỗng)");
+
+            // ✅ CASE 2: Intent chưa có groupId → query trip
+            Log.d("DEBUG_ALARM", "ℹ️ groupId null → query chat_groups để lấy groupId theo tripId");
+
+            FirebaseFirestore.getInstance()
+                    .collection("chat_groups")
+                    .whereEqualTo("tripId", tripId)
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(qs -> {
+                        if (qs.isEmpty()) {
+                            Log.d("DEBUG_ALARM", "ℹ️ Không có group nào gắn tripId này → không gửi group");
+                            return;
+                        }
+
+                        String groupIdFromGroup = qs.getDocuments().get(0).getId();
+                        Log.d("DEBUG_ALARM", "✅ Lấy groupId từ chat_groups → gửi group");
+                        Log.d("DEBUG_ALARM", "👉 groupIdFromGroup = " + groupIdFromGroup);
+
+                        sendGroupSystemMessage(
+                                groupIdFromGroup,
+                                tripId,
+                                tripName,
+                                namePlace,
+                                addressPlace,
+                                date,
+                                start,
+                                end
+                        );
+                    })
+                    .addOnFailureListener(e ->
+                            Log.e("DEBUG_ALARM", "❌ Lỗi query chat_groups", e)
+                    );
+
         }
+
+
+
+
     }
     // 📥 LƯU THÔNG BÁO ĐỂ HIỆN TRONG NotificationsActivity
     // =====================================================

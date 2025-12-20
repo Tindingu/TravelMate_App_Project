@@ -358,9 +358,10 @@ public class WishlistActivity extends AppCompatActivity {
             String addressPlace ,
             String date,
            String start,
-            String end// có thể null
+            String end
     ) {
         try {
+
             Log.d("DEBUG_NOTIFY", "Schedule for: " + placeName);
             Log.d("DEBUG_NOTIFY", "Start millis = " + startTimeMillis);
             Log.d("DEBUG_NOTIFY", "Now millis   = " + System.currentTimeMillis());
