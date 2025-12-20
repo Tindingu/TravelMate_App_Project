@@ -32,6 +32,8 @@ public class Message {
     private Timestamp editedAt;
     private String originalContent;
     private boolean isDeleted;
+    private String action;    // "OPEN_TRIP"
+    private String actionId;  // tripId
 
     public Message() {
         // Required empty constructor for Firestore
@@ -54,6 +56,21 @@ public class Message {
         this.readBy = new ArrayList<>();
         this.isEdited = false;
         this.isDeleted = false;
+    }
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getActionId() {
+        return actionId;
+    }
+
+    public void setActionId(String actionId) {
+        this.actionId = actionId;
     }
 
     // Getters and Setters

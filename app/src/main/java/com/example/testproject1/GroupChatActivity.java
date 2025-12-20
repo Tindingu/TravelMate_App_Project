@@ -61,7 +61,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private LinearLayout layoutReplyPreview;
     private TextView tvReplyToName, tvReplyToContent;
     private ImageView btnCancelReply;
-
+private ImageView btnAddTrip;
     private MessageAdapter adapter;
     private List<Message> messages;
     private String groupId;
@@ -144,7 +144,7 @@ public class GroupChatActivity extends AppCompatActivity {
         tvReplyToName = findViewById(R.id.tvReplyToName);
         tvReplyToContent = findViewById(R.id.tvReplyToContent);
         btnCancelReply = findViewById(R.id.btnCancelReply);
-
+        btnAddTrip=findViewById(R.id.btnAddTrip);
         messages = new ArrayList<>();
         tvGroupName.setText(groupName);
     }
@@ -157,6 +157,153 @@ public class GroupChatActivity extends AppCompatActivity {
 
         // Set long click listener for reply/reaction
         adapter.setOnMessageLongClickListener(message -> showMessageOptions(message));
+        adapter.setOnMessageClickListener(message -> {
+
+            if (!"OPEN_TRIP".equals(message.getAction())
+                    || message.getActionId() == null
+                    || currentUser == null) return;
+
+            String tripId = message.getActionId();
+
+            // 🔍 1. Kiểm tra quyền admin của user trong group
+            db.collection("chat_groups")
+                    .document(groupId)
+                    .get()
+                    .addOnSuccessListener(groupDoc -> {
+
+                        if (!groupDoc.exists()) return;
+
+                        List<String> adminIds = (List<String>) groupDoc.get("adminIds");
+                        boolean isAdmin = adminIds != null
+                                && adminIds.contains(currentUser.getUid());
+
+                        // 👤 2. Nếu KHÔNG phải admin → mới lưu trip
+                        if (!isAdmin) {
+                            saveTripForCurrentUser(tripId);
+                        }
+
+                        // 🔓 3. Luôn mở chi tiết trip
+                        FirebaseFirestore.getInstance()
+                                .collection("trips")
+                                .document(tripId)
+                                .get()
+                                .addOnSuccessListener(doc -> {
+
+                                    if (!doc.exists()) return;
+
+                                    TripModel trip = doc.toObject(TripModel.class);
+                                    if (trip == null) return;
+
+                                    // 🔥 Fix tripId null
+                                    trip.setTripId(doc.getId());
+
+                                    Intent intent = new Intent(
+                                            GroupChatActivity.this,
+                                            TripDetailActivity.class
+                                    );
+                                    intent.putExtra("trip_data", trip);
+                                    startActivity(intent);
+                                });
+                    });
+        });
+
+
+
+
+
+    }
+    private void saveTripForCurrentUser(String sourceTripId) {
+
+        if (currentUser == null) return;
+
+        String currentUserId = currentUser.getUid();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // 1️⃣ Check user đã có trip này chưa (theo sourceTripId)
+        db.collection("trips")
+                .whereEqualTo("userId", currentUserId)
+                .whereEqualTo("sourceTripId", sourceTripId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(checkSnap -> {
+
+                    if (!checkSnap.isEmpty()) {
+                        // ❌ Đã lưu rồi
+                        Toast.makeText(
+                                this,
+                                "Bạn đã lưu lịch trình này rồi",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
+                    }
+
+                    // 2️⃣ Lấy trip gốc
+                    db.collection("trips")
+                            .document(sourceTripId)
+                            .get()
+                            .addOnSuccessListener(sourceTripDoc -> {
+
+                                if (!sourceTripDoc.exists()) return;
+
+                                TripModel sourceTrip = sourceTripDoc.toObject(TripModel.class);
+                                if (sourceTrip == null) return;
+
+                                // 3️⃣ Tạo trip mới cho user
+                                String newTripId = db.collection("trips").document().getId();
+
+                                TripModel newTrip = new TripModel(
+                                        newTripId,
+                                        sourceTrip.getName(),
+                                        sourceTrip.getStartDate(),
+                                        sourceTrip.getEndDate(),
+                                        currentUserId
+                                );
+
+                                // 🔥 đánh dấu trip được lưu từ group
+                                newTrip.setSourceTripId(sourceTripId);
+
+                                db.collection("trips")
+                                        .document(newTripId)
+                                        .set(newTrip)
+                                        .addOnSuccessListener(a -> {
+
+                                            // 4️⃣ Clone schedule
+                                            cloneSchedule(sourceTripId, newTripId);
+
+                                            Toast.makeText(
+                                                    this,
+                                                    "Đã lưu lịch trình về của bạn",
+                                                    Toast.LENGTH_SHORT
+                                            ).show();
+                                        });
+                            });
+                });
+    }
+    private void cloneSchedule(String oldTripId, String newTripId) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("schedule")
+                .whereEqualTo("tripId", oldTripId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+
+                    for (DocumentSnapshot doc : snapshot) {
+
+                        ScheduleItemModel item = doc.toObject(ScheduleItemModel.class);
+                        if (item == null) continue;
+
+                        String newItemId = db.collection("schedule").document().getId();
+
+                        item.setItemId(newItemId);
+                        item.setTripId(newTripId);
+
+                        db.collection("schedule")
+                                .document(newItemId)
+                                .set(item);
+                    }
+                });
     }
 
     private void loadMessages() {
@@ -286,7 +433,218 @@ public class GroupChatActivity extends AppCompatActivity {
 
         // Toolbar buttons - Create task
         btnTask.setOnClickListener(v -> showCreateTaskDialog());
+        btnAddTrip.setOnClickListener(v -> {
+
+            if (currentUser == null) return;
+
+            db.collection("chat_groups")
+                    .document(groupId)
+                    .get()
+                    .addOnSuccessListener(doc -> {
+
+                        if (!doc.exists()) return;
+
+                        List<String> adminIds = (List<String>) doc.get("adminIds");
+
+                        if (adminIds != null && adminIds.contains(currentUser.getUid())) {
+                            // ✅ Là admin → cho add trip
+                            showSelectTripDialog();
+                        } else {
+                            // ❌ Không phải admin
+                            Toast.makeText(
+                                    this,
+                                    "Chỉ admin mới có quyền gắn chuyến đi cho nhóm",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, "Không kiểm tra được quyền admin", Toast.LENGTH_SHORT).show()
+                    );
+        });
+
+
     }
+//    private void showSelectTripDialog() {
+//        if (currentUser == null) return;
+//
+//        List<String> tripNames = new ArrayList<>();
+//        List<DocumentSnapshot> tripDocs = new ArrayList<>();
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Chọn chuyến đi cho nhóm");
+//
+//        db.collection("trips")
+//                .whereEqualTo("userId", currentUser.getUid())
+//                .get()
+//                .addOnSuccessListener(snapshot -> {
+//
+//                    if (snapshot.isEmpty()) {
+//                        Toast.makeText(this, "Bạn chưa có chuyến đi nào", Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
+//
+//                    for (DocumentSnapshot doc : snapshot) {
+//                        tripDocs.add(doc);
+//                        tripNames.add(doc.getString("name"));
+//                    }
+//
+//                    builder.setItems(
+//                            tripNames.toArray(new String[0]),
+//                            (dialog, which) -> attachGroupToTrip(tripDocs.get(which))
+//                    );
+//
+//                    builder.show();
+//                });
+//    }
+private void showSelectTripDialog() {
+    if (currentUser == null) return;
+
+    // 1️⃣ Lấy group hiện tại
+    db.collection("chat_groups")
+            .document(groupId)
+            .get()
+            .addOnSuccessListener(groupDoc -> {
+
+                if (!groupDoc.exists()) return;
+
+                String existingTripId = groupDoc.getString("tripId");
+
+                // ===============================
+                // CASE 1: GROUP ĐÃ CÓ TRIP → HỎI HỦY
+                // ===============================
+                if (existingTripId != null && !existingTripId.isEmpty()) {
+
+                    new AlertDialog.Builder(this)
+                            .setTitle("Hủy chuyến đi")
+                            .setMessage("Nhóm đang có một chuyến đi. Bạn có muốn hủy chuyến đi hiện tại không?")
+                            .setPositiveButton("Hủy chuyến đi", (dialog, which) -> {
+                                removeTripFromGroup(existingTripId);
+                            })
+                            .setNegativeButton("Không", null)
+                            .show();
+
+                    return;
+                }
+
+                // ===============================
+                // CASE 2: GROUP CHƯA CÓ TRIP → CHỌN TRIP
+                // ===============================
+                List<String> tripNames = new ArrayList<>();
+                List<DocumentSnapshot> tripDocs = new ArrayList<>();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Chọn chuyến đi cho nhóm");
+
+                db.collection("trips")
+                        .whereEqualTo("userId", currentUser.getUid())
+                        .get()
+                        .addOnSuccessListener(snapshot -> {
+
+                            if (snapshot.isEmpty()) {
+                                Toast.makeText(
+                                        this,
+                                        "Bạn chưa có chuyến đi nào",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                                return;
+                            }
+
+                            for (DocumentSnapshot doc : snapshot) {
+                                tripDocs.add(doc);
+                                tripNames.add(doc.getString("name"));
+                            }
+
+                            builder.setItems(
+                                    tripNames.toArray(new String[0]),
+                                    (dialog, which) ->
+                                            attachGroupToTrip(tripDocs.get(which))
+                            );
+
+                            builder.show();
+                        });
+            });
+}
+    private void removeTripFromGroup(String tripId) {
+        Map<String, Object> groupUpdate = new HashMap<>();
+        groupUpdate.put("tripId", FieldValue.delete());
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .update(groupUpdate)
+                .addOnSuccessListener(a -> {
+
+                    // optional: update flag trong trip
+                    db.collection("trips").document(tripId)
+                            .update("isGroupTrip", false);
+
+                    sendSystemMessage("❌ Admin đã hủy chuyến đi của nhóm");
+                    Toast.makeText(this, "Đã hủy chuyến đi của nhóm", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+
+
+    private void attachGroupToTrip(DocumentSnapshot tripDoc) {
+        if (currentUser == null) return;
+
+        String tripId = tripDoc.getId();
+        String tripName = tripDoc.getString("name");
+
+        // 1) Check group hiện tại đã có trip chưa
+        db.collection("chat_groups")
+                .document(groupId)
+                .get()
+                .addOnSuccessListener(groupDoc -> {
+                    if (!groupDoc.exists()) return;
+
+                    String existingTripId = groupDoc.getString("tripId");
+                    if (existingTripId != null && !existingTripId.isEmpty()) {
+                        Toast.makeText(this, "Nhóm đã có chuyến đi. Hãy hủy chuyến đi cũ trước.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // 2) Check trip này đã bị group khác dùng chưa (do trip không còn groupId)
+                    db.collection("chat_groups")
+                            .whereEqualTo("tripId", tripId)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener(snapshot -> {
+                                if (!snapshot.isEmpty()) {
+                                    Toast.makeText(this, "Trip này đã được gắn cho một nhóm khác", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                // 3) OK -> gắn trip cho group
+                                Map<String, Object> groupUpdate = new HashMap<>();
+                                groupUpdate.put("tripId", tripId);
+
+                                db.collection("chat_groups")
+                                        .document(groupId)
+                                        .update(groupUpdate)
+                                        .addOnSuccessListener(a -> {
+
+                                            // optional: update trip flag cho UI
+                                            db.collection("trips").document(tripId)
+                                                    .update("isGroupTrip", true);
+
+                                            sendTripSystemMessage(
+                                                    "🗺️ Nhóm đã được gắn vào chuyến đi \"" + tripName + "\"\n"
+                                                            + "             👉 Xem chi tiết | 💾 Lưu",
+                                                    tripId
+                                            );
+                                            Toast.makeText(this, "Đã gắn nhóm vào chuyến đi " + tripName, Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e ->
+                                                Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                        );
+                            });
+                });
+    }
+
+
 
     private void sendMessage() {
         String content = etMessage.getText().toString().trim();
@@ -717,4 +1075,22 @@ public class GroupChatActivity extends AppCompatActivity {
                 .collection("messages")
                 .add(message);
     }
+    private void sendTripSystemMessage(String content, String tripId) {
+        Message message = new Message(
+                groupId,
+                "system",
+                "Hệ thống",
+                "",
+                content,
+                "system"
+        );
+        message.setAction("OPEN_TRIP");
+        message.setActionId(tripId); // ✅ ĐÚNG là tripId
+
+        db.collection("chat_groups")
+                .document(groupId)
+                .collection("messages")
+                .add(message);
+    }
+
 }

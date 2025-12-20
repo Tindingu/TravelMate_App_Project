@@ -46,6 +46,15 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void setOnMessageLongClickListener(OnMessageLongClickListener listener) {
         this.longClickListener = listener;
     }
+    public interface OnMessageClickListener {
+        void onMessageClick(Message message);
+    }
+    private OnMessageClickListener clickListener;
+
+    public void setOnMessageClickListener(OnMessageClickListener listener) {
+        this.clickListener = listener;
+    }
+
 
     @Override
     public int getItemViewType(int position) {
@@ -271,7 +280,27 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void bindSystemMessage(SystemMessageViewHolder holder, Message message) {
         holder.tvSystemMessage.setText(message.getContent());
+
+        // Mặc định system message không click
+        holder.itemView.setOnClickListener(null);
+        holder.tvSystemMessage.setAlpha(0.7f);
+
+        // Nếu là system message có action OPEN_TRIP → cho click
+        if ("OPEN_TRIP".equals(message.getAction()) && message.getActionId() != null) {
+
+            holder.tvSystemMessage.setAlpha(1f);
+            holder.tvSystemMessage.setTextColor(
+                    context.getResources().getColor(R.color.blue_500, null)
+            );
+
+            holder.itemView.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onMessageClick(message);
+                }
+            });
+        }
     }
+
 
     @Override
     public int getItemCount() {

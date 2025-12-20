@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NotificationsActivity extends AppCompatActivity {
@@ -31,7 +32,6 @@ public class NotificationsActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
-
     private NotificationAdapter adapter;
     private List<Notification> notifications;
 
@@ -91,7 +91,7 @@ public class NotificationsActivity extends AppCompatActivity {
     private void loadNotifications() {
         db.collection("notifications")
                 .whereEqualTo("recipientId", currentUser.getUid())
-                .orderBy("createdAt", Query.Direction.DESCENDING)
+//                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .limit(50)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -106,9 +106,23 @@ public class NotificationsActivity extends AppCompatActivity {
                             notifications.add(notification);
                         }
                     }
+                    sortNotificationsByTime();
 
                     updateUI();
                 });
+    }
+    private void sortNotificationsByTime() {
+        Collections.sort(notifications, (n1, n2) -> {
+
+            if (n1.getCreatedAt() == null && n2.getCreatedAt() == null) return 0;
+            if (n1.getCreatedAt() == null) return 1;   // null xuống dưới
+            if (n2.getCreatedAt() == null) return -1;
+
+            // DESCENDING: mới nhất lên trên
+            return n2.getCreatedAt()
+                    .toDate()
+                    .compareTo(n1.getCreatedAt().toDate());
+        });
     }
 
     private void updateUI() {
