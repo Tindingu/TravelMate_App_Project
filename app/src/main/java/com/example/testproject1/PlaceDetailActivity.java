@@ -57,7 +57,6 @@ public class PlaceDetailActivity extends AppCompatActivity
     RatingBar ratingUser;
 
     // Nút thêm vào lịch trình
-    FloatingActionButton btnAddToTrip;
 
     RecyclerView rvComments, rvPreviewImages;
 
@@ -124,13 +123,7 @@ public class PlaceDetailActivity extends AppCompatActivity
         }
 
 
-        btnAddToTrip.setOnClickListener(v -> {
-            if (auth.getCurrentUser() == null) {
-                Toast.makeText(this, "Vui lòng đăng nhập!", Toast.LENGTH_SHORT).show();
-            } else {
-                showAddToTripDialog();
-            }
-        });
+
     }
 
     private void initViews() {
@@ -143,7 +136,6 @@ public class PlaceDetailActivity extends AppCompatActivity
         btnSendComment = findViewById(R.id.btnSendComment);
         btnAddImage = findViewById(R.id.btnAddImage);
         btnBack = findViewById(R.id.ivBack);
-        btnAddToTrip = findViewById(R.id.btnAddToTrip);
         rvComments = findViewById(R.id.rvComments);
         rvPreviewImages = findViewById(R.id.rvPreviewImages);
 

@@ -111,7 +111,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView tvResultInfo;
 
     // TODO: set API key
-    private static final String API_KEY_GEMINI = "AIzaSyANGkUknQ2C9VJdK0Pqi5HvAaYTRJPI2fI"; // Bạn cần điền API Key thật ở đây
+    private static final String API_KEY_GEMINI = ""; // Bạn cần điền API Key thật ở đây
 
 
     @Override
@@ -962,33 +962,41 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     // ⭐ NAV
     // ============================================================
     private void setupBottomNav() {
-        setActive(navHome);
+        navBookmark.setOnClickListener(v -> {
+            Intent intent = new Intent(this, WishlistActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
 
-        navHome.setOnClickListener(this::onNavClick);
-        navBookmark.setOnClickListener(this::onNavClick);
-        navChat.setOnClickListener(this::onNavClick);
-        navCalendar.setOnClickListener(this::onNavClick);
-        navNotification.setOnClickListener(this::onNavClick);
+
+
+        navCalendar.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, MyTripsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
+
+        navNotification.setOnClickListener(v ->
+                {
+                    Intent intent = new Intent(HomeActivity.this, NotificationsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                }
+        );
+        navChat.setOnClickListener(v ->
+                {
+                    Intent intent = new Intent(HomeActivity.this, ChatListActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                }
+        );
     }
 
-    private void onNavClick(View v) {
-        resetNav();
-        setActive((LinearLayout) v);
 
-        if (v.getId() == R.id.navBookmark) {
-            startActivity(new Intent(this, WishlistActivity.class));
-            overridePendingTransition(0, 0);
-        } else if (v.getId() == R.id.navCalendar) {
-            startActivity(new Intent(this, MyTripsActivity.class));
-            overridePendingTransition(0, 0);
-        } else if (v.getId() == R.id.navChat) {
-            startActivity(new Intent(this, ChatListActivity.class));
-            overridePendingTransition(0, 0);
-        } else if (v.getId() == R.id.navNotification) {
-            startActivity(new Intent(this, NotificationsActivity.class));
-            overridePendingTransition(0, 0);
-        }
-    }
 
     private void resetNav() {
         navHome.setBackground(null);

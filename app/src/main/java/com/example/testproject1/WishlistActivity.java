@@ -37,7 +37,7 @@ public class WishlistActivity extends AppCompatActivity {
 
     // ================= UI =================
     RecyclerView rvWishlist;
-    LinearLayout navHome, navBookmark, navCalendar, navNotification;
+    LinearLayout navHome, navBookmark, navCalendar, navNotification,navChat;
     LinearLayout layoutEmpty;
     TextView tvItemCount;
 
@@ -65,13 +65,12 @@ public class WishlistActivity extends AppCompatActivity {
         tvItemCount = findViewById(R.id.tvItemCount);
 
         rvWishlist.setLayoutManager(new LinearLayoutManager(this));
-
+        navHome = findViewById(R.id.navHome);
+        navBookmark = findViewById(R.id.navBookmark);
+        navChat = findViewById(R.id.navChat);
+        navCalendar = findViewById(R.id.navCalendar);
+        navNotification = findViewById(R.id.navNotification);
         db = FirebaseFirestore.getInstance();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            loadData();
-        }
-
         adapter = new PlaceAdapter(
                 wishlist,
                 place -> openPlaceDetail(place),
@@ -80,6 +79,13 @@ public class WishlistActivity extends AppCompatActivity {
                 place -> showAddToTripDialog(place)
         );
         rvWishlist.setAdapter(adapter);
+
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            loadData(); // ✅ GỌI SAU KHI ADAPTER SẴN SÀNG
+        }
+
+//        rvWishlist.setAdapter(adapter);
         setupBottomNav();
 
         // Android 13+ notification permission
@@ -93,6 +99,15 @@ public class WishlistActivity extends AppCompatActivity {
             }
         }
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (uid != null) {
+            loadData(); // 🔥 gắn lại listener mỗi lần quay lại
+        }
+    }
+
 
     // ================= PLACE DETAIL =================
     private void openPlaceDetail(PlaceModel place) {
@@ -120,6 +135,7 @@ public class WishlistActivity extends AppCompatActivity {
         EditText etEndTime = view.findViewById(R.id.etEndTime);
         EditText etNote = view.findViewById(R.id.etNote);
         Button btnConfirm = view.findViewById(R.id.btnConfirmAdd);
+
 
         List<String> tripNames = new ArrayList<>();
         ArrayAdapter<String> spinnerAdapter =
@@ -307,46 +323,7 @@ public class WishlistActivity extends AppCompatActivity {
 
 
 
-    // ================= ALARM =================
-//    private void scheduleTripNotification(long startTimeMillis, String placeName) {
-//        try {
-//            Log.d("DEBUG_NOTIFY", "Schedule for: " + placeName);
-//            Log.d("DEBUG_NOTIFY", "Start millis = " + startTimeMillis);
-//            Log.d("DEBUG_NOTIFY", "Now millis   = " + System.currentTimeMillis());
-//
-//            if (startTimeMillis <= System.currentTimeMillis()) {
-//                Log.e("DEBUG_NOTIFY", "Start time is in the past!");
-//                return;
-//            }
-//
-//            Intent intent = new Intent(this, TripAlarmReceiver.class);
-//            intent.putExtra("placeName", placeName);
-//
-//            PendingIntent pendingIntent = PendingIntent.getBroadcast(
-//                    this,
-//                    0,
-//                    intent,
-//                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-//            );
-//
-//            AlarmManager alarmManager =
-//                    (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//
-//            if (alarmManager != null) {
-//                alarmManager.setAndAllowWhileIdle(
-//                        AlarmManager.RTC_WAKEUP,
-//                        startTimeMillis,
-//                        pendingIntent
-//                );
-//
-//            }
-//
-//            Log.d("DEBUG_NOTIFY", "Alarm scheduled OK");
-//
-//        } catch (Exception e) {
-//            Log.e("DEBUG_NOTIFY", "CRASH in scheduleTripNotification", e);
-//        }
-//    }
+
     private void scheduleTripNotification(
             long startTimeMillis,
             String placeName,
@@ -460,22 +437,30 @@ public class WishlistActivity extends AppCompatActivity {
 
     // ================= DATA =================
     private void loadData() {
-        db.collection("users").document(uid).collection("wishlist")
-                .get()
-                .addOnSuccessListener(qs -> {
+        db.collection("users")
+                .document(uid)
+                .collection("wishlist")
+                .addSnapshotListener(this, (qs, e) -> {
+                    if (e != null || qs == null) return;
+
                     wishlist.clear();
+
                     for (DocumentSnapshot doc : qs) {
                         PlaceModel p = doc.toObject(PlaceModel.class);
                         if (p != null) {
-                            p.setId(doc.getId());
+                            p.setId(doc.getString("id")); // ← placeId THẬT
+
                             p.setFavorite(true);
                             wishlist.add(p);
                         }
                     }
+
                     adapter.notifyDataSetChanged();
                     checkEmptyState();
                 });
     }
+
+
 
     private void removeFromWishlist(PlaceModel place) {
         db.collection("users").document(uid)
@@ -497,15 +482,37 @@ public class WishlistActivity extends AppCompatActivity {
 
     // ================= NAV =================
     private void setupBottomNav() {
-        navHome = findViewById(R.id.navHome);
-        navCalendar = findViewById(R.id.navCalendar);
+        navHome.setOnClickListener(v -> {
+            Intent intent = new Intent(WishlistActivity.this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
 
-        navHome.setOnClickListener(v ->
-                startActivity(new Intent(this, HomeActivity.class))
+        navCalendar.setOnClickListener(v -> {
+            Intent intent = new Intent(WishlistActivity.this, MyTripsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
+
+        navNotification.setOnClickListener(v ->
+                {
+                    Intent intent = new Intent(WishlistActivity.this, NotificationsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                }
         );
-        navCalendar.setOnClickListener(v ->
-                startActivity(new Intent(this, MyTripsActivity.class))
+        navChat.setOnClickListener(v ->
+                {
+                    Intent intent = new Intent(WishlistActivity.this, ChatListActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                }
         );
+
     }
 
 }

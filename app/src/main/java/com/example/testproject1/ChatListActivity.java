@@ -38,6 +38,7 @@ public class ChatListActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
     private boolean showArchived = false;
+    private ImageView btnBack ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +70,7 @@ public class ChatListActivity extends AppCompatActivity {
         tabArchived = findViewById(R.id.tabArchived);
         btnAddFriend = findViewById(R.id.btnAddFriend);
         btnCreateGroup = findViewById(R.id.btnCreateGroup);
-
+        btnBack = findViewById(R.id.btnBack);
         allGroups = new ArrayList<>();
         filteredGroups = new ArrayList<>();
     }
@@ -172,6 +173,8 @@ public class ChatListActivity extends AppCompatActivity {
             Intent intent = new Intent(this, CreateGroupActivity.class);
             startActivity(intent);
         });
+        btnBack.setOnClickListener(v -> finish());
+
     }
 
     private void updateTabStyles() {

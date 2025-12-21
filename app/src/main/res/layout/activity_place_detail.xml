@@ -177,14 +177,4 @@
         </LinearLayout>
 
     </ScrollView>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnAddToTrip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
-        android:src="@drawable/ic_calendar"
-        app:backgroundTint="#FF9800"
-        app:tint="@android:color/white"
-        android:contentDescription="Add to trip" />
 </FrameLayout>

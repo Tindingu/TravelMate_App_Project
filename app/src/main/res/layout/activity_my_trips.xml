@@ -31,66 +31,141 @@
             android:layout_marginTop="4dp"/>
     </LinearLayout>
 
+<!--    <LinearLayout-->
+<!--        android:id="@+id/bottomNav"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="80dp"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center"-->
+<!--        android:background="@android:color/white"-->
+<!--        android:elevation="8dp"-->
+<!--        android:layout_alignParentBottom="true"> -->
+<!--        <LinearLayout-->
+<!--        android:id="@+id/navHome"-->
+<!--        android:layout_width="50dp"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_marginHorizontal="18dp">-->
+<!--        <ImageView-->
+<!--            android:id="@+id/icHome"-->
+<!--            android:layout_width="28dp"-->
+<!--            android:layout_height="28dp"-->
+<!--            android:src="@drawable/home" />-->
+<!--    </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/navBookmark"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_marginHorizontal="18dp"-->
+<!--            android:gravity="center">-->
+<!--            <ImageView-->
+<!--                android:id="@+id/icBookmark"-->
+<!--                android:layout_width="28dp"-->
+<!--                android:layout_height="28dp"-->
+<!--                android:src="@drawable/ic_bookmark" />-->
+<!--        </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/navCalendar"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_marginHorizontal="18dp"-->
+<!--            android:gravity="center"-->
+<!--            android:background="@drawable/nav_item_selected_bg">-->
+<!--            <ImageView-->
+<!--                android:id="@+id/icCalendar"-->
+<!--                android:layout_width="28dp"-->
+<!--                android:layout_height="28dp"-->
+<!--                android:layout_marginHorizontal="18dp"-->
+<!--                android:src="@drawable/ic_calendar" />-->
+<!--        </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/navNotification"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_marginHorizontal="18dp"-->
+<!--            android:gravity="center">-->
+<!--            <ImageView-->
+<!--                android:id="@+id/icNotification"-->
+<!--                android:layout_width="28dp"-->
+<!--                android:layout_height="28dp"-->
+<!--                android:src="@drawable/ic_ring" />-->
+<!--        </LinearLayout>-->
+<!--    </LinearLayout>-->
     <LinearLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:gravity="center"
         android:background="@android:color/white"
-        android:elevation="8dp"
-        android:layout_alignParentBottom="true"> <LinearLayout
-        android:id="@+id/navHome"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:layout_marginHorizontal="18dp">
-        <ImageView
-            android:id="@+id/icHome"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/home" />
-    </LinearLayout>
+        android:elevation="16dp">
+
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:layout_marginHorizontal="18dp"
+            >
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/home"
+                app:tint="#9E9E9E"/> </LinearLayout>
 
         <LinearLayout
             android:id="@+id/navBookmark"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginHorizontal="18dp"
-            android:gravity="center">
+            android:gravity="center"
+            >
             <ImageView
-                android:id="@+id/icBookmark"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/ic_bookmark" />
-        </LinearLayout>
+                android:src="@drawable/ic_bookmark"
+                app:tint="#9E9E9E"/> </LinearLayout>
 
         <LinearLayout
             android:id="@+id/navCalendar"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginHorizontal="18dp"
             android:gravity="center"
+            android:layout_marginHorizontal="18dp"
             android:background="@drawable/nav_item_selected_bg">
             <ImageView
-                android:id="@+id/icCalendar"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_marginHorizontal="18dp"
-                android:src="@drawable/ic_calendar" />
+                android:src="@drawable/ic_calendar"
+                app:tint="#000000"/>
         </LinearLayout>
-
+        <LinearLayout
+            android:id="@+id/navChat"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:layout_marginHorizontal="18dp">
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_chat"
+                app:tint="#9E9E9E"/>
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/navNotification"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginHorizontal="18dp"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_marginHorizontal="18dp">
             <ImageView
-                android:id="@+id/icNotification"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/ic_ring" />
+                android:src="@drawable/ic_ring"
+                app:tint="#9E9E9E"/>
         </LinearLayout>
     </LinearLayout>
 

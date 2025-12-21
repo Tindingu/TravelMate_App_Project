@@ -56,7 +56,7 @@ public class ChatGroupAdapter extends RecyclerView.Adapter<ChatGroupAdapter.View
                     .placeholder(R.drawable.avttest)
                     .into(holder.ivGroupAvatar);
         } else {
-            holder.ivGroupAvatar.setImageResource(R.drawable.avttest);
+            holder.ivGroupAvatar.setImageResource(R.drawable.ic_group1);
         }
 
         // Format last message

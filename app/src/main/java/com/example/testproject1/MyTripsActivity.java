@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class MyTripsActivity extends AppCompatActivity {
+    LinearLayout navHome, navBookmark, navChat, navCalendar, navNotification;
 
     private RecyclerView rvMyTrips;
     private TripAdapter adapter;
@@ -72,30 +73,41 @@ public class MyTripsActivity extends AppCompatActivity {
     }
 
     private void setupBottomNav() {
-        LinearLayout navHome = findViewById(R.id.navHome);
-        LinearLayout navBookmark = findViewById(R.id.navBookmark);
-        LinearLayout navCalendar = findViewById(R.id.navCalendar);
-        LinearLayout navNotification = findViewById(R.id.navNotification);
+        navHome = findViewById(R.id.navHome);
+        navBookmark = findViewById(R.id.navBookmark);
+        navChat = findViewById(R.id.navChat);
+        navCalendar = findViewById(R.id.navCalendar);
+        navNotification = findViewById(R.id.navNotification);
+
 
         navHome.setOnClickListener(v -> {
             Intent intent = new Intent(MyTripsActivity.this, HomeActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
             overridePendingTransition(0, 0);
-            finish();
         });
-
         navBookmark.setOnClickListener(v -> {
             Intent intent = new Intent(MyTripsActivity.this, WishlistActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
             overridePendingTransition(0, 0);
-            finish();
         });
 
-        navCalendar.setOnClickListener(v -> {});
+
+        navChat.setOnClickListener(v -> {
+            Intent intent = new Intent(MyTripsActivity.this, ChatListActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
 
         navNotification.setOnClickListener(v ->
-                Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show()
+                {
+                    Intent intent = new Intent(MyTripsActivity.this, NotificationsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                }
         );
     }
 

@@ -152,6 +152,7 @@
             btnAddTrip=findViewById(R.id.btnAddTrip);
             messages = new ArrayList<>();
             tvGroupName.setText(groupName);
+
         }
 
         private void setupRecyclerView() {
