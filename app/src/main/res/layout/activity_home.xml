@@ -10,46 +10,55 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="10dp"
         android:background="#FFFFFF">
 
         <!-- ================= TOP BAR ================= -->
+
+        <!-- ================= SEARCH BAR ================= -->
+        <!-- ================= TOP BAR + SEARCH MERGED ================= -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_rounded_border"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingHorizontal="20dp"
-            android:paddingBottom="16dp"
-            android:paddingTop="36dp"
-            android:gravity="center_vertical">
+            android:paddingTop="20dp"
+            android:paddingBottom="16dp">
 
-
-
+            <!-- Push content to right -->
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
+            <!-- Text -->
             <TextView
                 android:id="@+id/tvHello"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello User"
+                android:text="Hello Trí!"
                 android:textColor="#000"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:paddingRight="30dp"
-                />
+                android:layout_marginEnd="12dp"/>
 
+            <!-- Avatar -->
             <ImageView
                 android:id="@+id/ivProfile"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:padding="2dp"
-                android:src="@drawable/avttest" />
-
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/avttest"
+                android:background="@drawable/avatar_circle_bg"
+                android:padding="2dp"/>
         </LinearLayout>
 
-        <!-- ================= SEARCH BAR ================= -->
-        <!-- ================= TOP BAR + SEARCH MERGED ================= -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

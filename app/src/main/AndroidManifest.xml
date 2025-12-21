@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.testproject1">
+    package="com.example.travelmate">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -26,14 +26,14 @@
         android:networkSecurityConfig="@xml/network_security_config"
         >
         <receiver
-            android:name=".TripAlarmReceiver"
+            android:name="com.example.travelmate.trips.TripAlarmReceiver"
             android:exported="false"/>
         <activity
-            android:name=".HomeActivity"
+            android:name="com.example.travelmate.home.HomeActivity"
             android:exported="false" />
 
         <activity
-            android:name=".WelcomeActivity"
+            android:name="com.example.travelmate.auth.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,29 +41,29 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".ProfileUpdateActivity" />
-        <activity android:name=".ChangeAvatar" />
-        <activity android:name=".ChangeUsernameActivity" />
-        <activity android:name=".ChangePasswordActivity" />
-        <activity android:name=".ForgotPasswordActivity" />
-        <activity android:name=".WishlistActivity" />
-        <activity android:name=".PlaceDetailActivity" />
-        <activity android:name=".ChatListActivity" />
-        <activity android:name=".GroupChatActivity" />
-        <activity android:name=".GroupDashboardActivity" />
-        <activity android:name=".AddMembersActivity" />
-        <activity android:name=".FindFriendsActivity" />
-        <activity android:name=".FriendRequestsActivity" />
-        <activity android:name=".CreateGroupActivity" />
-        <activity android:name=".NotificationsActivity" />
-        <activity android:name=".PrivateChatDashboardActivity" />
-        <activity android:name=".MyTripsActivity"/>
-        <activity android:name=".TripDetailActivity"/>
+        <activity android:name="com.example.travelmate.auth.LoginActivity" />
+        <activity android:name="com.example.travelmate.auth.SignUpActivity" />
+        <activity android:name="com.example.travelmate.profile.ProfileActivity" />
+        <activity android:name="com.example.travelmate.profile.ProfileUpdateActivity" />
+        <activity android:name="com.example.travelmate.profile.ChangeAvatar" />
+        <activity android:name="com.example.travelmate.profile.ChangeUsernameActivity" />
+        <activity android:name="com.example.travelmate.profile.ChangePasswordActivity" />
+        <activity android:name="com.example.travelmate.auth.ForgotPasswordActivity" />
+        <activity android:name="com.example.travelmate.home.WishlistActivity" />
+        <activity android:name="com.example.travelmate.home.PlaceDetailActivity" />
+        <activity android:name="com.example.travelmate.chat.ChatListActivity" />
+        <activity android:name="com.example.travelmate.chat.GroupChatActivity" />
+        <activity android:name="com.example.travelmate.trips.GroupDashboardActivity" />
+        <activity android:name="com.example.travelmate.chat.AddMembersActivity" />
+        <activity android:name="com.example.travelmate.friends.FindFriendsActivity" />
+        <activity android:name="com.example.travelmate.friends.FriendRequestsActivity" />
+        <activity android:name="com.example.travelmate.chat.CreateGroupActivity" />
+        <activity android:name="com.example.travelmate.notifications.NotificationsActivity" />
+        <activity android:name="com.example.travelmate.chat.PrivateChatDashboardActivity" />
+        <activity android:name="com.example.travelmate.trips.MyTripsActivity"/>
+        <activity android:name="com.example.travelmate.trips.TripDetailActivity"/>
 
-        <activity android:name=".ProfilePublicActivity" />
+        <activity android:name="com.example.travelmate.profile.ProfilePublicActivity" />
 
 
 
