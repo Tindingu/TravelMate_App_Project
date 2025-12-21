@@ -8,12 +8,12 @@
     <!-- AVATAR -->
     <ImageView
         android:id="@+id/imgAvatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="10dp"
         android:background="@drawable/avatar_circle_bg"
         android:scaleType="centerCrop"
-        android:src="@drawable/avttest"
-        android:layout_marginRight="10dp"/>
+        android:src="@drawable/avttest" />
 
     <!-- MAIN CONTENT -->
     <LinearLayout
@@ -32,23 +32,23 @@
             <TextView
                 android:id="@+id/tvUser"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Tên người dùng"
                 android:textColor="#000"
                 android:textSize="15sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <RatingBar
                 android:id="@+id/ratingUser"
-                android:numStars="5"
-                android:stepSize="1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:isIndicator="true"
+                android:numStars="5"
                 android:progressDrawable="@drawable/rating_star"
                 android:scaleX="0.6"
                 android:scaleY="0.6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:stepSize="1" />
         </LinearLayout>
 
         <!-- TIME + LIKE + DISLIKE -->

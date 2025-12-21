@@ -35,6 +35,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -403,41 +405,90 @@ public class PlaceDetailActivity extends AppCompatActivity
         }
     }
 
-    private void uploadImagesThenSend(String username, String uid, String msg, long time, int ratingValue) {
-        ArrayList<String> uploadedUrls = new ArrayList<>();
-        for (Uri uri : selectedImages) {
-            File file = uriToFile(uri);
-            if (file == null) {
-                Toast.makeText(this, "Không đọc được file", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String filename = UUID.randomUUID() + ".jpg";
-            PreSignService.getPreSignedUrl("http://10.0.2.2:3000/presign", filename, new PreSignService.Callback() {
-                @Override
-                public void onSuccess(String uploadUrl, String finalUrl) {
-                    S3Uploader.uploadImage(file, uploadUrl, finalUrl, new S3Uploader.UploadCallback() {
-                        @Override
-                        public void onUploaded(String url) {
-                            uploadedUrls.add(url);
+//    private void uploadImagesThenSend(String username, String uid, String msg, long time, int ratingValue) {
+//        ArrayList<String> uploadedUrls = new ArrayList<>();
+//        for (Uri uri : selectedImages) {
+//            File file = uriToFile(uri);
+//            if (file == null) {
+//                Toast.makeText(this, "Không đọc được file", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            String filename = UUID.randomUUID() + ".jpg";
+//            PreSignService.getPreSignedUrl("http://10.0.2.2:3000/presign", filename, new PreSignService.Callback() {
+//                @Override
+//                public void onSuccess(String uploadUrl, String finalUrl) {
+//                    S3Uploader.uploadImage(file, uploadUrl, finalUrl, new S3Uploader.UploadCallback() {
+//                        @Override
+//                        public void onUploaded(String url) {
+//                            uploadedUrls.add(url);
+//                            if (uploadedUrls.size() == selectedImages.size()) {
+//                                CommentModel c = new CommentModel(username, msg, time, ratingValue, uploadedUrls);
+//                                c.setUid(uid);
+//                                pushComment(c);
+//                            }
+//                        }
+//                        @Override
+//                        public void onError(String err) {
+//                            Toast.makeText(PlaceDetailActivity.this, "Upload lỗi: " + err, Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                }
+//                @Override
+//                public void onError(String err) {
+//                    Toast.makeText(PlaceDetailActivity.this, "Không lấy được presigned URL: " + err, Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }
+//    }
+private void uploadImagesThenSend(
+        String username,
+        String uid,
+        String msg,
+        long time,
+        int ratingValue
+) {
+    ArrayList<String> uploadedUrls = new ArrayList<>();
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+
+    for (Uri uri : selectedImages) {
+
+        String filename = UUID.randomUUID().toString() + ".jpg";
+        StorageReference ref = storage
+                .getReference()
+                .child("comments")
+                .child(placeId)
+                .child(filename);
+
+        ref.putFile(uri)
+                .addOnSuccessListener(taskSnapshot ->
+                        ref.getDownloadUrl().addOnSuccessListener(downloadUri -> {
+
+                            uploadedUrls.add(downloadUri.toString());
+
+                            // ✅ Khi upload đủ ảnh → gửi comment
                             if (uploadedUrls.size() == selectedImages.size()) {
-                                CommentModel c = new CommentModel(username, msg, time, ratingValue, uploadedUrls);
+                                CommentModel c = new CommentModel(
+                                        username,
+                                        msg,
+                                        time,
+                                        ratingValue,
+                                        uploadedUrls
+                                );
                                 c.setUid(uid);
                                 pushComment(c);
                             }
-                        }
-                        @Override
-                        public void onError(String err) {
-                            Toast.makeText(PlaceDetailActivity.this, "Upload lỗi: " + err, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-                @Override
-                public void onError(String err) {
-                    Toast.makeText(PlaceDetailActivity.this, "Không lấy được presigned URL: " + err, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+                        })
+                )
+                .addOnFailureListener(e ->
+                        Toast.makeText(
+                                this,
+                                "Upload ảnh thất bại: " + e.getMessage(),
+                                Toast.LENGTH_SHORT
+                        ).show()
+                );
     }
+}
+
 
     private void pushComment(CommentModel c) {
         db.collection("places").document(placeId).collection("comments").add(c)

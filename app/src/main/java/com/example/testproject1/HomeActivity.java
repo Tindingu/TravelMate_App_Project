@@ -111,7 +111,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView tvResultInfo;
 
     // TODO: set API key
-    private static final String API_KEY_GEMINI = ""; // Bạn cần điền API Key thật ở đây
+    private static final String API_KEY_GEMINI = "AIzaSyBymhxFyq-breXvLwI6GUl7Th291ayjVnk"; // Bạn cần điền API Key thật ở đây
 
 
     @Override
