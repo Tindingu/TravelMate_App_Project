@@ -151,7 +151,6 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         ivSearchBtn.setOnClickListener(v -> {
             String query = etSearch.getText().toString().trim();
             if (!query.isEmpty()) {
-                Toast.makeText(this, "AI đang tìm kiếm...", Toast.LENGTH_SHORT).show();
                 // Xóa các loại đã chọn trước đó nếu không phải từ filter
                 selectedTypes.clear();
                 runAI(query);
