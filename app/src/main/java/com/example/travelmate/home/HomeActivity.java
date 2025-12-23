@@ -114,14 +114,14 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private final Set<String> selectedTypes = new HashSet<>();
     private int selectedDistance = 1000; // meters
-    private int selectedRating = 3;
+//    private int selectedRating = 3;
     private int selectedSoLuong = 15;
 
     private LinearLayout layoutResultInfo;
     private TextView tvResultInfo;
 
     // TODO: set API key
-    private static final String API_KEY_GEMINI = "AIzaSyBymhxFyq-breXvLwI6GUl7Th291ayjVnk"; // Bạn cần điền API Key thật ở đây
+    private static final String API_KEY_GEMINI = ""; // Bạn cần điền API Key thật ở đây
 
 
     @Override
@@ -718,16 +718,16 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         // --- RATING SEEKBAR ---
-        seekRating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                selectedRating = progress;
-                tvRatingValue.setText(progress + " sao");
-            }
-
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
+//        seekRating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                selectedRating = progress;
+//                tvRatingValue.setText(progress + " sao");
+//            }
+//
+//            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+//            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+//        });
         // --- SO LUONG KET QUA ---
         seekSoLuong.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -753,7 +753,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         Log.d("FILTER", "Types = " + selectedTypes);
         Log.d("FILTER", "Distance = " + selectedDistance + "m");
-        Log.d("FILTER", "Rating >= " + selectedRating);
+//        Log.d("FILTER", "Rating >= " + selectedRating);
 
         // TODO: Lọc danh sách hoặc gọi API tùy bạn
         Toast.makeText(this, "Đã áp dụng bộ lọc!", Toast.LENGTH_SHORT).show();
@@ -813,7 +813,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         tvRatingValue.setText("3 sao");
 
         selectedDistance = 1000;
-        selectedRating = 3;
+//        selectedRating = 3;
     }
 
     private void resetFilter() {
@@ -825,16 +825,16 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Reset về các giá trị mặc định
         selectedDistance = 1000;
-        selectedRating = 3;
+//        selectedRating = 3;
         selectedSoLuong = 15;
 
         // Cập nhật Seekbar (dựa trên giá trị mặc định)
         seekDistance.setProgress( (selectedDistance - 100) * 100 / 19900 );
-        seekRating.setProgress(selectedRating - 1);
+//        seekRating.setProgress(selectedRating - 1);
         seekSoLuong.setProgress( (selectedSoLuong - 5) * 100 / 45 );
 
         tvDistanceValue.setText(String.format(Locale.getDefault(), "%d m", selectedDistance));
-        tvRatingValue.setText(String.format(Locale.getDefault(), "≥ %d sao", selectedRating));
+//        tvRatingValue.setText(String.format(Locale.getDefault(), "≥ %d sao", selectedRating));
         tvSoLuong.setText(String.format(Locale.getDefault(), "%d địa điểm", selectedSoLuong));
 
         selectedTypes.clear();
